@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/Neosoft_CV_Builder_Frontend/static/css/main.efa24446.css",
+    "main.js": "/Neosoft_CV_Builder_Frontend/static/js/main.9dc47ada.js",
+    "static/js/135.24cc1165.chunk.js": "/Neosoft_CV_Builder_Frontend/static/js/135.24cc1165.chunk.js",
+    "static/js/977.a4ecc380.chunk.js": "/Neosoft_CV_Builder_Frontend/static/js/977.a4ecc380.chunk.js",
+    "static/js/455.e22ed001.chunk.js": "/Neosoft_CV_Builder_Frontend/static/js/455.e22ed001.chunk.js",
+    "static/js/221.485cf4d8.chunk.js": "/Neosoft_CV_Builder_Frontend/static/js/221.485cf4d8.chunk.js",
+    "index.html": "/Neosoft_CV_Builder_Frontend/index.html",
+    "main.efa24446.css.map": "/Neosoft_CV_Builder_Frontend/static/css/main.efa24446.css.map",
+    "main.9dc47ada.js.map": "/Neosoft_CV_Builder_Frontend/static/js/main.9dc47ada.js.map",
+    "135.24cc1165.chunk.js.map": "/Neosoft_CV_Builder_Frontend/static/js/135.24cc1165.chunk.js.map",
+    "977.a4ecc380.chunk.js.map": "/Neosoft_CV_Builder_Frontend/static/js/977.a4ecc380.chunk.js.map",
+    "455.e22ed001.chunk.js.map": "/Neosoft_CV_Builder_Frontend/static/js/455.e22ed001.chunk.js.map",
+    "221.485cf4d8.chunk.js.map": "/Neosoft_CV_Builder_Frontend/static/js/221.485cf4d8.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.efa24446.css",
+    "static/js/main.9dc47ada.js"
+  ]
+}
