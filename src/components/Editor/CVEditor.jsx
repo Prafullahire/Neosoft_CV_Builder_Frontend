@@ -205,10 +205,17 @@ const CVEditor = () => {
 
     return (
         <Container fluid className="cv-editor-container">
-            <Row className="editor-header">
+            <Row className="editor-header align-items-center">
                 <Col>
                     <h2>CV Editor</h2>
                     <ProgressBar now={progress} label={`Step ${currentStep + 1} of ${steps.length}`} />
+                </Col>
+                <Col xs="auto">
+                    <div className="header-actions">
+                        <Button variant="outline-primary" onClick={() => navigate('/dashboard')}>
+                            Dashboard
+                        </Button>
+                    </div>
                 </Col>
             </Row>
 

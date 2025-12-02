@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/cvs';
+const API_URL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL.replace(/\/$/, '')}/api/cvs` : 'http://localhost:5000/api/cvs';
 
 const getAuthConfig = () => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -44,8 +44,21 @@ export const deleteCV = async (id) => {
 
 // Get public CV
 export const getPublicCV = async (id) => {
-    const response = await axios.get(`${API_URL}/public/${id}`);
-    return response.data;
+    try {
+        const response = await axios.get(`${API_URL}/public/${id}`);
+        return response.data;
+    } catch (err) {
+        // Normalize error for frontend handling
+        if (err.response) {
+            // Server responded with a status outside 2xx
+            const message = err.response.data?.message || err.response.statusText || 'Server error';
+            const error = new Error(message);
+            error.status = err.response.status;
+            throw error;
+        }
+        // Network or other error
+        throw new Error(err.message || 'Network error');
+    }
 };
 
 const cvService = {

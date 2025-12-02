@@ -28,7 +28,16 @@ import App from "./App.js";
 import "./index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-const GOOGLE_CLIENT_ID = process.env.VITE_GOOGLE_CLIENT_ID; // ✅ Correct for Vite
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || "";
+
+if (!GOOGLE_CLIENT_ID) {
+  // Warn during development if the client id is missing
+  // This prevents the Google script from being initialized with client_id=undefined
+  // and causing the GSI errors you saw in the console.
+  // If you prefer not to log, remove the following line.
+  // eslint-disable-next-line no-console
+  console.warn("REACT_APP_GOOGLE_CLIENT_ID is not set. Google OAuth buttons will be broken.");
+}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

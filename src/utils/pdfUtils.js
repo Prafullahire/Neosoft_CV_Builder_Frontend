@@ -69,7 +69,22 @@ export const generatePDF = async (elementId = 'cv-preview-wrapper', filename = '
  * @param {string} cvName - Name for the share title
  */
 export const shareCV = async (cvId, cvName = 'My CV') => {
-    const shareUrl = `${window.location.origin}/cv/${cvId}`;
+    // Build share URL that respects a possible app subpath (PUBLIC_URL)
+    const publicUrl = (process.env.REACT_APP_PUBLIC_URL || process.env.PUBLIC_URL || '').replace(/\/$/, '');
+    let path = `/cv/${cvId}`;
+    if (publicUrl) {
+        // If PUBLIC_URL is set (e.g., '/Neosoft_CV_Builder_Frontend') include it
+        path = `${publicUrl}${path}`;
+    } else {
+        // Fallback: if app is served from a subpath in the current location, try to preserve it
+        const pathname = window.location.pathname || '/';
+        const firstSegment = pathname.split('/').filter(Boolean)[0];
+        if (firstSegment && firstSegment !== 'cv' && firstSegment !== 'editor' && firstSegment !== 'login') {
+            path = `/${firstSegment}${path}`;
+        }
+    }
+
+    const shareUrl = `${window.location.origin}${path}`;
     const shareData = {
         title: cvName,
         text: 'Check out my CV!',

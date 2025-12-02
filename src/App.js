@@ -41,8 +41,10 @@ import CVEditor from "./components/Editor/CVEditor";
 import PublicCV from "./components/Common/PublicCV";
 
 function App() {
+  const basename = process.env.PUBLIC_URL || '/';
+
   return (
-    <Router>
+    <Router basename={basename}>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
