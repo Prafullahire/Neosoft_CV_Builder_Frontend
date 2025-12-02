@@ -1,180 +1,120 @@
-# CV Builder — Backend
+# CV Builder — Frontend
 
-This README provides a general, ready-to-edit template for a backend that serves a CV Builder application. Adjust the examples and environment variables to match your actual backend implementation.
+Frontend for the CV Builder application. This project is a React single-page app (created with `react-scripts`) that allows users to create, preview, and export CVs using several templates.
+
+**Repository:** `Neosoft_CV_Builder_Frontend`
 
 ## Overview
 
-Backend for the CV Builder app. Responsibilities include:
-- User authentication (register, login, profile)
-- CRUD for CVs/resumes and their sections (personal, education, experience, projects, skills, social links)
-- PDF generation of CVs
-- Optional payment or premium feature handling
-- File upload (profile images, attachments)
+The frontend provides:
+- A multi-step CV editor with sections for personal details, education, experience, projects, skills, and social links.
+- Live preview of selected templates.
+- Export to PDF functionality.
+- Authentication UI (login / register / social auth) and integration with a backend API.
 
-## Features
+## Tech Stack
 
-- RESTful JSON API
-- JWT-based authentication
-- File uploads (e.g., profile pictures)
-- PDF generation (server-side)
-- Optional integration with payment gateway (Stripe, Razorpay, etc.)
-- Rate limiting / basic security best practices suggested
-
-## Tech Stack (example)
-
-- Node.js + Express
-- MongoDB / PostgreSQL (replace if needed)
-- Mongoose or Prisma (ORM/ODM)
-- JSON Web Tokens (JWT) for auth
-- Multer for file uploads
-- A PDF library (e.g., Puppeteer, pdfkit) for PDF generation
+- React (`react`, `react-dom`)
+- React Router (`react-router-dom`)
+- State & forms: `react-hook-form`, `formik`, `yup`
+- UI: `bootstrap`, `react-bootstrap`
+- PDF & screenshot: `jspdf`, `html2canvas`, `@react-pdf/renderer`
+- HTTP client: `axios`
+- Auth helpers: `js-cookie`, `jwt-decode`
 
 ## Prerequisites
 
 - Node.js (v16+ recommended)
-- npm or yarn
-- A database (MongoDB, Postgres, etc.)
-- Optional: Docker and docker-compose
+- npm (bundled) or `yarn`
 
-## Getting Started (development)
+## Project Structure (important files)
 
-1. Clone the repo (or ensure backend code is present in this folder):
+- `public/` — static HTML, manifest and public assets
+- `src/` — application source
+  - `components/` — React components grouped by feature
+  - `context/` — React Context providers (e.g., `AuthContext.jsx`)
+  - `hooks/` — custom hooks (`useAuth.js`, `useForm.js`)
+  - `services/` — API wrappers (`api.js`, `authService.js`, `cvService.js`)
+  - `utils/` — helpers and constants
+  - `index.js` — app entry
+
+## Scripts
+
+The project uses the scripts defined in `package.json`:
+
+- **Start (development):** `npm start` — runs the app in development mode using `react-scripts start`.
+- **Build (production):** `npm run build` — creates an optimized production build in the `build/` folder.
+- **Test:** `npm test` — runs the test runner.
+- **Eject:** `npm run eject` — ejects from `create-react-app` tooling (one-way).
+- **Deploy (GitHub Pages):** `npm run predeploy` then `npm run deploy` — deploys `build/` to GitHub Pages (uses `gh-pages` dev dependency). The repo `homepage` is set to `https://Prafullahire.github.io/Neosoft_CV_Builder_Frontend`.
+
+Use these commands:
 
 ```bash
-git clone <repo-url>
-cd <backend-folder>
-```
-
-2. Install dependencies:
-
-```bash
+# Install
 npm install
-# or
-yarn install
-```
 
-3. Create an `.env` file (see example below)
-
-4. Run the development server:
-
-```bash
-npm run dev
-# or
+# Development server
 npm start
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
+
+# Deploy to GitHub Pages (if configured)
+npm run deploy
 ```
 
-Server should run on the port specified in `PORT` (default `3000` or `5000`).
+## Environment / Configuration
 
-## Environment Variables (example `.env`)
+This frontend is mostly static but may require a few environment variables for API endpoints or keys. Create a `.env` file in the project root as needed. Example:
 
 ```
-PORT=5000
-NODE_ENV=development
-DATABASE_URL=mongodb://localhost:27017/cv_builder
-JWT_SECRET=your_jwt_secret_here
-JWT_EXPIRES_IN=7d
-UPLOADS_DIR=./uploads
-STRIPE_SECRET_KEY=sk_test_...
+REACT_APP_API_URL=https://api.example.com
+REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id
 ```
 
-Adjust values to match your database and secrets.
+Notes:
+- Prefix variables with `REACT_APP_` to make them available in the React app.
 
-## API — Common Endpoints (examples)
+## Connecting to Backend
 
-- Auth
-  - `POST /api/auth/register` — Register a new user
-  - `POST /api/auth/login` — Login and receive JWT
-  - `GET /api/auth/me` — Get current user (requires `Authorization: Bearer <token>`)
+- The frontend expects a REST API backend for authentication and CV storage. Update `src/services/api.js` to point to your backend base URL (or use `REACT_APP_API_URL`).
+- Protected routes use JWT stored in cookies (`js-cookie`) and include the token in `Authorization` headers.
 
-- Users
-  - `GET /api/users/:id` — Get user profile
-  - `PUT /api/users/:id` — Update profile (auth required)
+## PDF & Export
 
-- CVs
-  - `POST /api/cvs` — Create a CV (auth required)
-  - `GET /api/cvs` — List user's CVs (auth required)
-  - `GET /api/cvs/:id` — Get CV by id
-  - `PUT /api/cvs/:id` — Update CV
-  - `DELETE /api/cvs/:id` — Delete CV
+- The project includes client-side PDF export using `html2canvas` + `jspdf` and server-side PDF generation helpers (`@react-pdf/renderer`) may also be supported by the backend.
 
-- PDF
-  - `GET /api/cvs/:id/pdf` — Get generated PDF for CV
+## Deploying
 
-- Uploads
-  - `POST /api/uploads` — Upload files (multipart/form-data)
-
-Return formats should be JSON; errors should use standard HTTP status codes.
-
-## Authentication
-
-- Use `Authorization: Bearer <token>` header for protected routes
-- Token issuance on login and registration
-- Token verification middleware to protect endpoints
-
-## File Uploads
-
-- Use `multipart/form-data`
-- Store uploads in `UPLOADS_DIR` or cloud storage (S3, GCS)
-- Validate file types and sizes server-side
-
-## PDF Generation
-
-- Generate HTML templates for CVs and render to PDF (e.g., Puppeteer)
-- Provide an endpoint that streams the PDF back to the client
-
-## Database
-
-- Provide migrations or schema files (if using SQL)
-- For MongoDB, provide seed scripts if necessary
+- For static hosting serve the `build/` folder (Netlify, Vercel, GitHub Pages, S3 + CloudFront, etc.).
+- When deploying to production, set `REACT_APP_API_URL` to your backend URL and configure CORS on the backend.
 
 ## Tests
 
-- Add unit and integration tests (Jest, Supertest for Node/Express)
-- Example: `npm test`
-
-## Docker (optional)
-
-Provide a `Dockerfile` and `docker-compose.yml` for the app and DB. Example commands:
-
-```bash
-# build
-docker build -t cv-builder-backend .
-# run with docker-compose
-docker-compose up
-```
-
-## Deployment
-
-- Use environment variables for secrets
-- Use a process manager (PM2) or container orchestrator
-- Store uploads in cloud storage rather than local disk in production
-
-## Security & Best Practices
-
-- Never commit secrets to source control
-- Validate and sanitize inputs
-- Use HTTPS in production
-- Rate limit endpoints and add CORS configuration
+- Add unit tests under `src/` using the existing testing libraries (`@testing-library/react`, `jest`).
 
 ## Contributing
 
-- Fork the repo and open a PR with changes
-- Follow the existing code style and add tests for new behavior
+- Fork, create a feature branch, add tests, and open a pull request.
 
 ## Troubleshooting
 
-- If DB connection fails: check `DATABASE_URL` and DB status
-- If file uploads fail: check permissions on `UPLOADS_DIR`
-
-## Contact / Authors
-
-- Project: CV Builder
-- Maintainer: adapt to your team details
+- If the dev server fails to start: ensure no other process is using port 3000 and that Node and npm are installed.
+- If API requests fail: check `REACT_APP_API_URL` and CORS settings on the backend.
 
 ## License
 
-Specify your license (e.g., MIT) or remove this section.
+Add your license information here (e.g., MIT).
 
 ---
 
-Note: This README is a template for a backend service. Please update endpoint URIs, commands, and environment variables to match the actual backend implementation and folder structure in your repository.
+If you want, I can:
+- Generate a `README_frontend.md` instead of replacing this file.
+- Add a `PUBLIC_URL` or `.env.example` file.
+- Extract API endpoints automatically by scanning `src/services` and add a short API section.
+
+Tell me which of these you'd like next.
