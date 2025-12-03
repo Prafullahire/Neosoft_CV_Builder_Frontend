@@ -88,6 +88,7 @@ const CVEditor = () => {
         }
     };
 
+    // Updating Form Data
     const handleDataChange = (section, data) => {
         setCvData((prev) => ({
             ...prev,
@@ -220,7 +221,6 @@ const CVEditor = () => {
             </Row>
 
             <Row className="editor-content">
-                {/* Left Panel - Form */}
                 <Col md={5} className="form-panel">
                     <div className="step-indicator">
                         <h3>{steps[currentStep].name}</h3>

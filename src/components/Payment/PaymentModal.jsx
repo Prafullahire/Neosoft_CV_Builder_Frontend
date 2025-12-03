@@ -23,7 +23,6 @@ const PaymentModal = ({ show, onHide, onPaymentSuccess, amount = 499 }) => {
         setLoading(true);
         setError('');
 
-        // Simulate payment processing
         setTimeout(() => {
             setLoading(false);
             if (paymentDetails.cardNumber.length < 16) {
