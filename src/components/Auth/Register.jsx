@@ -14,6 +14,26 @@ const Register = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
+        setError(''); // Clear previous errors
+
+        // Basic client-side validation
+        if (!username.trim()) {
+            setError('Username is required');
+            return;
+        }
+        if (!email.trim()) {
+            setError('Email is required');
+            return;
+        }
+        if (!password.trim()) {
+            setError('Password is required');
+            return;
+        }
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters');
+            return;
+        }
+
         try {
             const config = {
                 headers: {
@@ -23,18 +43,31 @@ const Register = () => {
 
             const { data } = await axios.post(
                 'http://localhost:5000/api/auth/register',
-                { username, email, password, contactNumber },
+                { 
+                    username: username.trim(), 
+                    email: email.trim(), 
+                    password, 
+                    contactNumber: contactNumber.trim() || undefined  // Send undefined if empty
+                },
                 config
             );
 
             localStorage.setItem('userInfo', JSON.stringify(data));
             navigate('/dashboard');
         } catch (error) {
-            setError(
-                error.response && error.response.data.message
-                    ? error.response.data.message
-                    : error.message
-            );
+            // Improved error handling
+            if (error.response && error.response.data) {
+                // Backend returned error details
+                const errorMsg = error.response.data.message || error.response.data.error || 'Registration failed';
+                setError(errorMsg);
+                console.error('Backend error:', error.response.data);
+            } else if (error.request) {
+                // Request made but no response from server
+                setError('No response from server. Is the backend running on http://localhost:5000?');
+            } else {
+                // Other errors
+                setError(error.message || 'An error occurred during registration');
+            }
         }
     };
 
