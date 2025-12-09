@@ -9,6 +9,7 @@ const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [contactNumber, setContactNumber] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
@@ -27,6 +28,10 @@ const Register = () => {
         }
         if (!password.trim()) {
             setError('Password is required');
+            return;
+        }
+        if(email && !/\S+@\S+\.\S+/.test(email)) {
+            setError('Email is invalid');
             return;
         }
         if (password.length < 6) {
@@ -136,13 +141,22 @@ const Register = () => {
 
                         <Form.Group className='mb-3' controlId='password'>
                             <Form.Label>Password</Form.Label>
-                            <Form.Control
-                                type='password'
-                                placeholder='Enter password'
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
+                            <div className='d-flex'>
+                                <Form.Control
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder='Enter password'
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                                <Button
+                                    variant='outline-secondary'
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={{ marginLeft: '-40px', zIndex: 10, border: 'none' }}
+                                >
+                                    {showPassword ? '🙈' : '👁️'}
+                                </Button>
+                            </div>
                         </Form.Group>
 
                         <Button variant='primary' type='submit' className='w-100'>

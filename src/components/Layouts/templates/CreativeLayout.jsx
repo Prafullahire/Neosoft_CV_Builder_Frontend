@@ -2,6 +2,7 @@ import React from 'react';
 import './LayoutStyles.css';
 
 const CreativeLayout = ({ data }) => {
+    // Using destructuring, the important sections of a CV are extracted
     const { basicDetails, education, experience, projects, skills, socialProfiles } = data;
 
     return (
@@ -14,6 +15,7 @@ const CreativeLayout = ({ data }) => {
                     )}
                     <div className="header-text">
                         <h1>{basicDetails?.name || 'Your Name'}</h1>
+                        {basicDetails?.designation && <h3 className="designation">{basicDetails.designation}</h3>}
                         {basicDetails?.intro && <p className="tagline">{basicDetails.intro}</p>}
                     </div>
                 </div>

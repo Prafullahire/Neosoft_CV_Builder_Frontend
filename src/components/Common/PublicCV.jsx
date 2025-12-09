@@ -10,6 +10,7 @@ const PublicCV = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Fetch data when page loads
     useEffect(() => {
         fetchCV();
     }, [id]);

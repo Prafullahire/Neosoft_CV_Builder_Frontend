@@ -3,6 +3,7 @@ import { Card, Button, Badge } from 'react-bootstrap';
 import './CVCard.css';
 
 const CVCard = ({ cv, onEdit, onDelete, onDownload, onShare }) => {
+    // Converts a timestamp (updatedAt) into a readable date format
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -27,7 +28,7 @@ const CVCard = ({ cv, onEdit, onDelete, onDownload, onShare }) => {
                     </p>
                     {cv.basicDetails?.email && (
                         <p className="text-muted mb-1">
-                            <small>📧 {cv.basicDetails.email}</small>
+                            <small>{cv.basicDetails.email}</small>
                         </p>
                     )}
                 </div>

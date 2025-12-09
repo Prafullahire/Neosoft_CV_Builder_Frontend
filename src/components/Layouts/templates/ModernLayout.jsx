@@ -55,6 +55,7 @@ const ModernLayout = ({ data }) => {
             <div className="modern-main">
                 <div className="modern-header">
                     <h1>{basicDetails?.name || 'Your Name'}</h1>
+                    {basicDetails?.designation && <h3 className="designation">{basicDetails.designation}</h3>}
                     {basicDetails?.intro && <p className="intro-text">{basicDetails.intro}</p>}
                 </div>
 

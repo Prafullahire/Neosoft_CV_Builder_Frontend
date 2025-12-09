@@ -13,6 +13,7 @@ const ProfessionalLayout = ({ data }) => {
                 )}
                 <div className="header-info">
                     <h1>{basicDetails?.name || 'Your Name'}</h1>
+                    {basicDetails?.designation && <h3 className="designation">{basicDetails.designation}</h3>}
                     <div className="contact-info">
                         {basicDetails?.email && <span>📧 {basicDetails.email}</span>}
                         {basicDetails?.phone && <span>📱 {basicDetails.phone}</span>}

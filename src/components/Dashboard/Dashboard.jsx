@@ -11,10 +11,13 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
+  // Fetch CVs When Page Loads
   useEffect(() => {
     fetchCVs();
   }, []);
 
+
+  // API request to get CVs and Saves them to state using setCvs
   const fetchCVs = async () => {
     try {
       const data = await cvService.getCVs();
@@ -26,6 +29,8 @@ const Dashboard = () => {
     }
   };
 
+
+  // Clears login session & Redirects to login page
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
     navigate("/login");
@@ -51,6 +56,7 @@ const Dashboard = () => {
       }
     }
   };
+  // Opens the CV in a new tab for download
   const handleDownload = (id) => {
     const base = "/Neosoft_CV_Builder_Frontend"; 
     window.open(`${base}/cv/${id}`, "_blank");
