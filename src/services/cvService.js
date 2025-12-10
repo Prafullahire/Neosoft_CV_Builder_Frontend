@@ -48,9 +48,7 @@ export const getPublicCV = async (id) => {
         const response = await axios.get(`${API_URL}/public/${id}`);
         return response.data;
     } catch (err) {
-        // Normalize error for frontend handling
         if (err.response) {
-            // Server responded with a status outside 2xx
             const message = err.response.data?.message || err.response.statusText || 'Server error';
             const error = new Error(message);
             error.status = err.response.status;
