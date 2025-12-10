@@ -1,182 +1,199 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
-import { GoogleLogin } from '@react-oauth/google';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Form } from "react-bootstrap";
+import { GoogleLogin } from "@react-oauth/google";
+import { toast } from "react-toastify";
+import "../../styles/Register.css";
 
 const Register = () => {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [contactNumber, setContactNumber] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
-    const submitHandler = async (e) => {
-        e.preventDefault();
-        setError(''); // Clear previous errors
+  const validate = () => {
+    if (!username) {
+      toast.error("Username is required");
+      return false;
+    }
+    if (!email) {
+      toast.error("Email is required");
+      return false;
+    }
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email");
+      return false;
+    }
+    if (!password) {
+      toast.error("Password is required");
+      return false;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return false;
+    }
 
-        // Basic client-side validation
-        if (!username.trim()) {
-            setError('Username is required');
-            return;
-        }
-        if (!email.trim()) {
-            setError('Email is required');
-            return;
-        }
-        if (!password.trim()) {
-            setError('Password is required');
-            return;
-        }
-        if(email && !/\S+@\S+\.\S+/.test(email)) {
-            setError('Email is invalid');
-            return;
-        }
-        if (password.length < 6) {
-            setError('Password must be at least 6 characters');
-            return;
-        }
+    return true;
+  };
 
-        try {
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            };
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
 
-            const { data } = await axios.post(
-                'http://localhost:5000/api/auth/register',
-                { 
-                    username: username.trim(), 
-                    email: email.trim(), 
-                    password, 
-                    contactNumber: contactNumber.trim() || undefined  // Send undefined if empty
-                },
-                config
-            );
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
 
-            localStorage.setItem('userInfo', JSON.stringify(data));
-            navigate('/dashboard');
-        } catch (error) {
-            // Improved error handling
-            if (error.response && error.response.data) {
-                // Backend returned error details
-                const errorMsg = error.response.data.message || error.response.data.error || 'Registration failed';
-                setError(errorMsg);
-                console.error('Backend error:', error.response.data);
-            } else if (error.request) {
-                // Request made but no response from server
-                setError('No response from server. Is the backend running on http://localhost:5000?');
-            } else {
-                // Other errors
-                setError(error.message || 'An error occurred during registration');
-            }
-        }
-    };
+      const { data } = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/auth/register`,
+        {
+          username: username.trim(),
+          email: email.trim(),
+          password,
+          contactNumber: contactNumber.trim() || undefined, // Send undefined if empty
+        },
+        config
+      );
 
-    const googleSuccess = async (credentialResponse) => {
-        try {
-            const { credential } = credentialResponse;
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            };
-            const { data } = await axios.post(
-                'http://localhost:5000/api/auth/google',
-                { tokenId: credential },
-                config
-            );
-            localStorage.setItem('userInfo', JSON.stringify(data));
-            navigate('/dashboard');
-        } catch (error) {
-            setError('Google Signup Failed');
-        }
-    };
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      navigate("/dashboard");
+    } catch (error) {
+      if (error.response && error.response.data) {
+        toast.error("Please check your inputs. Something is wrong!");
+      } else if (error.request) {
+        toast.error("No response from server. Is the backend running?");
+      } else {
+        toast.error(error.message || "An error occurred during registration");
+      }
+    }
+  };
 
-    const googleError = () => {
-        setError('Google Signup Failed');
-    };
+  const googleSuccess = async (credentialResponse) => {
+    try {
+      const { credential } = credentialResponse;
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/auth/google`,
+        { tokenId: credential },
+        config
+      );
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error("Google Signup Failed");
+    }
+  };
 
-    return (
-        <Container className='d-flex justify-content-center align-items-center' style={{ minHeight: '100vh' }}>
-            <Card style={{ width: '400px' }} className='p-4 shadow'>
-                <Card.Body>
-                    <h2 className='text-center mb-4'>Sign Up</h2>
-                    {error && <Alert variant='danger'>{error}</Alert>}
-                    <Form onSubmit={submitHandler}>
-                        <Form.Group className='mb-3' controlId='username'>
-                            <Form.Label>Username</Form.Label>
-                            <Form.Control
-                                type='text'
-                                placeholder='Enter username'
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
+  // const googleError = () => {
+  //   toast.error("Google Signup Failed");
+  // };
 
-                        <Form.Group className='mb-3' controlId='email'>
-                            <Form.Label>Email Address</Form.Label>
-                            <Form.Control
-                                type='email'
-                                placeholder='Enter email'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
+  return (
+    <div className="auth-main">
+      <div className="auth-box">
+        <div className="auth-left">
+          <div className="image-area">
+            <span className="placeholder-img">🖼️</span>
+          </div>
+        </div>
 
-                        <Form.Group className='mb-3' controlId='contactNumber'>
-                            <Form.Label>Contact Number (Optional)</Form.Label>
-                            <Form.Control
-                                type='text'
-                                placeholder='Enter contact number'
-                                value={contactNumber}
-                                onChange={(e) => setContactNumber(e.target.value)}
-                            />
-                        </Form.Group>
+        <div className="auth-right">
+          <h2 className="auth-title mb-2">Create Account</h2>
+          <p className="auth-subtitle mb-4">
+            Register to continue accessing your dashboard
+          </p>
 
-                        <Form.Group className='mb-3' controlId='password'>
-                            <Form.Label>Password</Form.Label>
-                            <div className='d-flex'>
-                                <Form.Control
-                                    type={showPassword ? 'text' : 'password'}
-                                    placeholder='Enter password'
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                                <Button
-                                    variant='outline-secondary'
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    style={{ marginLeft: '-40px', zIndex: 10, border: 'none' }}
-                                >
-                                    {showPassword ? '🙈' : '👁️'}
-                                </Button>
-                            </div>
-                        </Form.Group>
+          <Form onSubmit={submitHandler}>
+            <div className="input-group-custom mb-3">
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+              <i className="input-icon">👤</i>
+            </div>
 
-                        <Button variant='primary' type='submit' className='w-100'>
-                            Register
-                        </Button>
-                    </Form>
-                    <div className="mt-3 d-flex justify-content-center">
-                        <GoogleLogin
-                            onSuccess={googleSuccess}
-                            onError={googleError}
-                            text="signup_with"
-                        />
-                    </div>
-                    <div className='mt-3 text-center'>
-                        Have an account? <Link to='/login'>Login</Link>
-                    </div>
-                </Card.Body>
-            </Card>
-        </Container>
-    );
+            <div className="input-group-custom mb-3">
+              <input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <i className="input-icon">📧</i>
+            </div>
+
+            <div className="input-group-custom mb-3">
+              <input
+                type="text"
+                placeholder="Contact number (optional)"
+                value={contactNumber}
+                onChange={(e) => setContactNumber(e.target.value)}
+              />
+              <i className="input-icon">📱</i>
+            </div>
+
+            <div className="input-group-custom mb-4">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <i
+                className="input-icon"
+                style={{ cursor: "pointer" }}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "🔒" : "👁️"}
+              </i>
+            </div>
+
+            <button type="submit" className="auth-btn">
+              Register
+            </button>
+          </Form>
+
+          <div className="mt-3">
+            {/* <GoogleLogin
+              onSuccess={googleSuccess}
+              onError={() => toast.error("Google sign-in failed")}
+              text="signup_with"
+            /> */}
+            <GoogleLogin
+              onSuccess={googleSuccess}
+              onError={() => toast.error("Google sign-in failed")}
+              text="signup_with"
+            />
+          </div>
+
+          <p className="mt-4 register-small-text">
+            Already have an account?{" "}
+            <Link to="/login" className="forgot">
+              Login
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Register;

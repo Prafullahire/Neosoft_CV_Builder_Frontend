@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { LayoutGrid, FileText, LogOut, Plus, Edit2, Trash2, Download, Share2, User } from "lucide-react";
 import cvService from "../../services/cvService";
-import CVCard from "./CVCard";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -11,13 +11,10 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  // Fetch CVs When Page Loads
   useEffect(() => {
     fetchCVs();
   }, []);
 
-
-  // API request to get CVs and Saves them to state using setCvs
   const fetchCVs = async () => {
     try {
       const data = await cvService.getCVs();
@@ -29,8 +26,6 @@ const Dashboard = () => {
     }
   };
 
-
-  // Clears login session & Redirects to login page
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
     navigate("/login");
@@ -40,9 +35,7 @@ const Dashboard = () => {
     navigate("/layouts");
   };
 
-  const handleEdit = (id) => {
-    navigate(`/editor/${id}`);
-  };
+  const handleEdit = (id) => navigate(`/editor/${id}`);
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this CV?")) {
@@ -56,28 +49,19 @@ const Dashboard = () => {
       }
     }
   };
-  // Opens the CV in a new tab for download
+
   const handleDownload = (id) => {
-    const base = "/Neosoft_CV_Builder_Frontend"; 
-    window.open(`${base}/cv/${id}`, "_blank");
+    window.open(`/Neosoft_CV_Builder_Frontend/cv/${id}`, "_blank");
   };
 
   const handleShare = async (id) => {
     try {
       const cv = cvs.find((c) => c._id === id);
-      if (!cv.isPublic) {
-        await cvService.updateCV(id, { ...cv, isPublic: true });
-      }
-
+      if (!cv.isPublic) await cvService.updateCV(id, { ...cv, isPublic: true });
       const { shareCV } = await import("../../utils/pdfUtils");
       const cvName = cv.basicDetails?.name || "My CV";
       const result = await shareCV(id, cvName);
-
-      if (result.success) {
-        alert(result.message);
-      } else {
-        alert(`Failed to share: ${result.message}`);
-      }
+      alert(result.success ? result.message : `Failed to share: ${result.message}`);
     } catch (error) {
       console.error("Error sharing CV:", error);
       alert("Failed to share CV");
@@ -85,52 +69,151 @@ const Dashboard = () => {
   };
 
   return (
-    <Container className="dashboard-container mt-5">
-      <div className="dashboard-header">
-        <div>
-          <h1>Welcome, {userInfo ? userInfo.username : "User"}</h1>
-          <p className="text-muted">Manage your CVs and create new ones</p>
+    <div className="dashboard-layout">
+      {/* Sidebar */}
+      <div className="sidebar">
+        {/* Logo Section */}
+        <div className="sidebar-header">
+          <div className="logo-container">
+            <div className="logo-icon">
+              <FileText size={24} />
+            </div>
+            <div>
+              <h1 className="sidebar-logo">CV Builder</h1>
+              <p className="sidebar-tagline">Create and manage resumes</p>
+            </div>
+          </div>
         </div>
-        <div className="header-actions">
-          <Button variant="success" size="lg" onClick={handleCreateNew}>
-            + Create New CV
-          </Button>
-          <Button variant="danger" onClick={logoutHandler}>
-            Logout
-          </Button>
+
+        {/* Navigation */}
+        <nav className="sidebar-nav">
+          <button className="nav-item active">
+            <LayoutGrid size={20} />
+            <span>Dashboard</span>
+          </button>
+        </nav>
+
+        {/* User Section */}
+        <div className="sidebar-user">
+          <div className="user-profile-card">
+            <div className="user-avatar">
+              <User size={20} />
+            </div>
+            <div className="user-details">
+              <p className="user-name">{userInfo?.username || "User"}</p>
+              <p className="user-status">Logged in</p>
+            </div>
+          </div>
+          <button onClick={logoutHandler} className="logout-btn">
+            <LogOut size={18} />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
 
-      {loading ? (
-        <div className="text-center mt-5">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
+      {/* Main Content */}
+      <div className="main-content">
+        <div className="content-wrapper">
+          {/* Welcome Header */}
+          <div className="welcome-header">
+            <h2 className="welcome-title">Welcome back, {userInfo?.username || "User"}!</h2>
+            <p className="welcome-subtitle">Manage your CVs and create new ones</p>
+          </div>
+
+          {/* Your CVs Section */}
+          <div className="cvs-section">
+            <div className="section-header">
+              <h3 className="section-title">Your CVs</h3>
+              <button onClick={handleCreateNew} className="create-btn-header">
+                <Plus size={18} />
+                Create New CV
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="loading-container">
+                <Spinner animation="border" style={{ color: "#2ecc71" }} />
+                <p className="loading-text">Loading your CVs...</p>
+              </div>
+            ) : (
+              <div className="cvs-grid">
+                {/* Create New CV Card */}
+                {/* <div onClick={handleCreateNew} className="create-cv-card">
+                  <div className="create-cv-icon">
+                    <Plus size={40} strokeWidth={2.5} />
+                  </div>
+                  <h4 className="create-cv-title">Create New CV</h4>
+                  <p className="create-cv-subtitle">Start building your professional resume</p>
+                </div> */}
+
+                {/* Existing CVs */}
+                {cvs.length === 0 ? (
+                  <div className="empty-state-message">
+                    <div className="empty-icon">
+                      <FileText size={48} />
+                    </div>
+                    <h3 className="empty-state-title">No CVs yet</h3>
+                    <p className="empty-state-text">Create your first CV to get started</p>
+                  </div>
+                ) : (
+                  cvs.map((cv) => (
+                    <div key={cv._id} className="cv-item-card">
+                      <div className="cv-card-header">
+                        <div className="cv-icon-wrapper">
+                          <FileText size={24} />
+                        </div>
+                        <div className="cv-card-info">
+                          <h4 className="cv-card-title">
+                            {cv.basicDetails?.name || "Untitled CV"}
+                          </h4>
+                          <p className="cv-card-date">
+                            Last updated: {new Date(cv.updatedAt || Date.now()).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="cv-card-actions">
+                        <button
+                          onClick={() => handleEdit(cv._id)}
+                          className="action-btn edit-btn"
+                          title="Edit"
+                        >
+                          <Edit2 size={16} />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          onClick={() => handleDownload(cv._id)}
+                          className="action-btn download-btn"
+                          title="Download"
+                        >
+                          <Download size={16} />
+                          <span>Download</span>
+                        </button>
+                        <button
+                          onClick={() => handleShare(cv._id)}
+                          className="action-btn share-btn"
+                          title="Share"
+                        >
+                          <Share2 size={16} />
+                          <span>Share</span>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(cv._id)}
+                          className="action-btn delete-btn"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      ) : cvs.length === 0 ? (
-        <div className="empty-state">
-          <h3>No CVs yet</h3>
-          <p>Create your first CV to get started</p>
-          <Button variant="primary" size="lg" onClick={handleCreateNew}>
-            Create Your First CV
-          </Button>
-        </div>
-      ) : (
-        <Row className="mt-4">
-          {cvs.map((cv) => (
-            <Col key={cv._id} md={4} className="mb-4">
-              <CVCard
-                cv={cv}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onDownload={handleDownload}
-                onShare={handleShare}
-              />
-            </Col>
-          ))}
-        </Row>
-      )}
-    </Container>
+      </div>
+    </div>
   );
 };
 

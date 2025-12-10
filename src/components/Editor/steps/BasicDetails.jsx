@@ -49,10 +49,8 @@ const BasicDetails = ({ data, onChange, onValidation, }) => {
 
   React.useImperativeHandle(useRef(null), () => ({ validateForm }), []);
 
-  // Pass validateForm to parent through onValidation prop or expose via ref
  useEffect(() => {
     if (onValidation) {
-      // Store validateForm in window or context for parent to call
       window.currentStepValidate = validateForm;
     }
   }, [data, errors]);
