@@ -6,7 +6,6 @@ const ModernLayout = ({ data }) => {
 
     return (
         <div className="cv-layout modern-layout">
-            {/* Sidebar */}
             <div className="modern-sidebar">
                 {basicDetails?.image && (
                     <img src={basicDetails.image} alt="Profile" className="profile-image-modern" />
@@ -20,7 +19,6 @@ const ModernLayout = ({ data }) => {
                     {basicDetails?.city && <p>{basicDetails.city}, {basicDetails.state} {basicDetails.pincode}</p>}
                 </div>
 
-                {/* Skills in Sidebar */}
                 {skills && skills.length > 0 && (
                     <div className="sidebar-section">
                         <h2>Skills</h2>
@@ -38,7 +36,6 @@ const ModernLayout = ({ data }) => {
                     </div>
                 )}
 
-                {/* Social Profiles in Sidebar */}
                 {socialProfiles && socialProfiles.length > 0 && (
                     <div className="sidebar-section">
                         <h2>Social</h2>
@@ -51,7 +48,6 @@ const ModernLayout = ({ data }) => {
                 )}
             </div>
 
-            {/* Main Content */}
             <div className="modern-main">
                 <div className="modern-header">
                     <h1>{basicDetails?.name || 'Your Name'}</h1>
@@ -59,7 +55,6 @@ const ModernLayout = ({ data }) => {
                     {basicDetails?.intro && <p className="intro-text">{basicDetails.intro}</p>}
                 </div>
 
-                {/* Experience */}
                 {experience && experience.length > 0 && (
                     <div className="modern-section">
                         <h2 className="section-title">Experience</h2>

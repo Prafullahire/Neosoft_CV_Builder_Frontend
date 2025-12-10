@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { LayoutGrid, FileText, LogOut, Plus, Edit2, Trash2, Download, Share2, User } from "lucide-react";
+import {
+  LayoutGrid,
+  FileText,
+  LogOut,
+  Plus,
+  Edit2,
+  Trash2,
+  Download,
+  Share2,
+  User,
+} from "lucide-react";
 import cvService from "../../services/cvService";
 import "./Dashboard.css";
 
@@ -61,7 +71,9 @@ const Dashboard = () => {
       const { shareCV } = await import("../../utils/pdfUtils");
       const cvName = cv.basicDetails?.name || "My CV";
       const result = await shareCV(id, cvName);
-      alert(result.success ? result.message : `Failed to share: ${result.message}`);
+      alert(
+        result.success ? result.message : `Failed to share: ${result.message}`
+      );
     } catch (error) {
       console.error("Error sharing CV:", error);
       alert("Failed to share CV");
@@ -70,9 +82,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-layout">
-      {/* Sidebar */}
       <div className="sidebar">
-        {/* Logo Section */}
         <div className="sidebar-header">
           <div className="logo-container">
             <div className="logo-icon">
@@ -85,7 +95,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Navigation */}
         <nav className="sidebar-nav">
           <button className="nav-item active">
             <LayoutGrid size={20} />
@@ -93,7 +102,6 @@ const Dashboard = () => {
           </button>
         </nav>
 
-        {/* User Section */}
         <div className="sidebar-user">
           <div className="user-profile-card">
             <div className="user-avatar">
@@ -116,11 +124,14 @@ const Dashboard = () => {
         <div className="content-wrapper">
           {/* Welcome Header */}
           <div className="welcome-header">
-            <h2 className="welcome-title">Welcome back, {userInfo?.username || "User"}!</h2>
-            <p className="welcome-subtitle">Manage your CVs and create new ones</p>
+            <h2 className="welcome-title">
+              Welcome back, {userInfo?.username || "User"}!
+            </h2>
+            <p className="welcome-subtitle">
+              Manage your CVs and create new ones
+            </p>
           </div>
 
-          {/* Your CVs Section */}
           <div className="cvs-section">
             <div className="section-header">
               <h3 className="section-title">Your CVs</h3>
@@ -137,23 +148,15 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="cvs-grid">
-                {/* Create New CV Card */}
-                {/* <div onClick={handleCreateNew} className="create-cv-card">
-                  <div className="create-cv-icon">
-                    <Plus size={40} strokeWidth={2.5} />
-                  </div>
-                  <h4 className="create-cv-title">Create New CV</h4>
-                  <p className="create-cv-subtitle">Start building your professional resume</p>
-                </div> */}
-
-                {/* Existing CVs */}
                 {cvs.length === 0 ? (
                   <div className="empty-state-message">
                     <div className="empty-icon">
                       <FileText size={48} />
                     </div>
                     <h3 className="empty-state-title">No CVs yet</h3>
-                    <p className="empty-state-text">Create your first CV to get started</p>
+                    <p className="empty-state-text">
+                      Create your first CV to get started
+                    </p>
                   </div>
                 ) : (
                   cvs.map((cv) => (
@@ -167,7 +170,10 @@ const Dashboard = () => {
                             {cv.basicDetails?.name || "Untitled CV"}
                           </h4>
                           <p className="cv-card-date">
-                            Last updated: {new Date(cv.updatedAt || Date.now()).toLocaleDateString()}
+                            Last updated:{" "}
+                            {new Date(
+                              cv.updatedAt || Date.now()
+                            ).toLocaleDateString()}
                           </p>
                         </div>
                       </div>

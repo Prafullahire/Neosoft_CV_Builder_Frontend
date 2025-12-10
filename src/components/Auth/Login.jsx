@@ -13,7 +13,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const validate = () => {
-    if(!email || !password) return toast.error("All fields are required");
+    if (!email || !password) return toast.error("All fields are required");
     if (!email) return toast.error("Email is required");
     const reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!reg.test(email)) return toast.error("Enter a valid email");
@@ -49,7 +49,6 @@ const Login = () => {
   const googleSuccess = async (res) => {
     try {
       const { credential } = res;
-
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/auth/google`,
         { tokenId: credential },
@@ -67,7 +66,6 @@ const Login = () => {
   return (
     <div className="auth-main">
       <div className="auth-box">
-
         <div className="auth-left">
           <div className="image-area">
             <span className="placeholder-img">🖼️</span>
@@ -81,7 +79,6 @@ const Login = () => {
           </p>
 
           <Form onSubmit={submitHandler} className="mt-3">
-
             <div className="input-group-custom mb-3">
               <Form.Control
                 type="email"
@@ -104,13 +101,9 @@ const Login = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 style={{ cursor: "pointer" }}
               >
-                🔒
+                {showPassword ? "🔒" : "👁️"}
               </span>
             </div>
-
-            {/* <div className="text-end mb-3">
-              <Link className="forgot">Forget Password?</Link>
-            </div> */}
 
             <Button className="auth-btn" type="submit">
               Login Account

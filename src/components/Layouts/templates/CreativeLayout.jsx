@@ -2,12 +2,10 @@ import React from 'react';
 import './LayoutStyles.css';
 
 const CreativeLayout = ({ data }) => {
-    // Using destructuring, the important sections of a CV are extracted
     const { basicDetails, education, experience, projects, skills, socialProfiles } = data;
 
     return (
         <div className="cv-layout creative-layout">
-            {/* Creative Header with Gradient */}
             <div className="creative-header">
                 <div className="header-content">
                     {basicDetails?.image && (
@@ -27,11 +25,8 @@ const CreativeLayout = ({ data }) => {
             </div>
 
             <div className="creative-content">
-                {/* Two Column Layout */}
                 <div className="creative-columns">
-                    {/* Left Column */}
                     <div className="creative-left">
-                        {/* Experience */}
                         {experience && experience.length > 0 && (
                             <div className="creative-section">
                                 <h2 className="creative-heading">💼 Experience</h2>
@@ -57,7 +52,6 @@ const CreativeLayout = ({ data }) => {
                             </div>
                         )}
 
-                        {/* Projects */}
                         {projects && projects.length > 0 && (
                             <div className="creative-section">
                                 <h2 className="creative-heading">🚀 Projects</h2>
@@ -82,9 +76,7 @@ const CreativeLayout = ({ data }) => {
                         )}
                     </div>
 
-                    {/* Right Column */}
                     <div className="creative-right">
-                        {/* Education */}
                         {education && education.length > 0 && (
                             <div className="creative-section">
                                 <h2 className="creative-heading">🎓 Education</h2>
@@ -101,7 +93,6 @@ const CreativeLayout = ({ data }) => {
                             </div>
                         )}
 
-                        {/* Skills */}
                         {skills && skills.length > 0 && (
                             <div className="creative-section">
                                 <h2 className="creative-heading">⚡ Skills</h2>
@@ -116,7 +107,6 @@ const CreativeLayout = ({ data }) => {
                             </div>
                         )}
 
-                        {/* Social Profiles */}
                         {socialProfiles && socialProfiles.length > 0 && (
                             <div className="creative-section">
                                 <h2 className="creative-heading">🔗 Connect</h2>

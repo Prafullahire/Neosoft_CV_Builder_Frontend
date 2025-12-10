@@ -4,6 +4,21 @@
 // const Projects = ({ data = [], onChange }) => {
 //     const [errors, setErrors] = useState({});
 
+//     useEffect(() => {
+//         if (data.length === 0) {
+//             onChange([
+//                 {
+//                     title: '',
+//                     description: '',
+//                     duration: '',
+//                     teamSize: '',
+//                     technologies: [],
+//                     role: '',
+//                 },
+//             ]);
+//         }
+//     }, []); // run once
+
 //     const handleAdd = () => {
 //         onChange([
 //             ...data,
@@ -21,7 +36,7 @@
 //     const handleRemove = (index) => {
 //         const newData = data.filter((_, i) => i !== index);
 //         onChange(newData);
-//         // Clear errors for removed item
+
 //         const newErrors = { ...errors };
 //         delete newErrors[index];
 //         setErrors(newErrors);
@@ -31,7 +46,7 @@
 //         const newData = [...data];
 //         newData[index] = { ...newData[index], [field]: value };
 //         onChange(newData);
-//         // Clear error for this field when user edits
+
 //         if (errors[`${index}-${field}`]) {
 //             const newErrors = { ...errors };
 //             delete newErrors[`${index}-${field}`];
@@ -59,8 +74,8 @@
 //         return isValid;
 //     };
 
-//     // Expose validation to parent
-//    useEffect(() => {
+//     // 👉 Expose validation function to parent
+//     useEffect(() => {
 //         window.projectsValidate = validateProjects;
 //     }, [data, errors]);
 
@@ -72,7 +87,7 @@
 //         <div className="array-section">
 //             {Object.keys(errors).length > 0 && (
 //                 <Alert variant="warning" className="mb-3">
-//                     <Alert.Heading> Please fill in all required fields:</Alert.Heading>
+//                     <Alert.Heading> Please fill in required fields:</Alert.Heading>
 //                     <ul className="mb-0">
 //                         {Object.values(errors).map((error, idx) => (
 //                             <li key={idx}>{error}</li>
@@ -96,7 +111,7 @@
 //                             type="text"
 //                             value={project.title}
 //                             onChange={(e) => handleChange(index, 'title', e.target.value)}
-//                             placeholder="e.g., E-commerce Platform"
+//                             placeholder="e.g., Stock Market Prediction System"
 //                             isInvalid={!!getFieldError(index, 'title')}
 //                             required
 //                         />
@@ -114,7 +129,7 @@
 //                             rows={3}
 //                             value={project.description}
 //                             onChange={(e) => handleChange(index, 'description', e.target.value)}
-//                             placeholder="Describe the project..."
+//                             placeholder="Brief project description..."
 //                         />
 //                     </Form.Group>
 
@@ -124,7 +139,7 @@
 //                             type="text"
 //                             value={project.duration}
 //                             onChange={(e) => handleChange(index, 'duration', e.target.value)}
-//                             placeholder="e.g., 6 months"
+//                             placeholder="e.g., 3 months"
 //                         />
 //                     </Form.Group>
 
@@ -134,7 +149,7 @@
 //                             type="number"
 //                             value={project.teamSize}
 //                             onChange={(e) => handleChange(index, 'teamSize', e.target.value)}
-//                             placeholder="e.g., 5"
+//                             placeholder="e.g., 4"
 //                             min="1"
 //                         />
 //                     </Form.Group>
@@ -145,7 +160,7 @@
 //                             type="text"
 //                             value={project.technologies?.join(', ') || ''}
 //                             onChange={(e) => handleTechnologiesChange(index, e.target.value)}
-//                             placeholder="e.g., React, Express, PostgreSQL"
+//                             placeholder="e.g., Next.js, Flask, MongoDB"
 //                         />
 //                     </Form.Group>
 
@@ -155,7 +170,7 @@
 //                             type="text"
 //                             value={project.role}
 //                             onChange={(e) => handleChange(index, 'role', e.target.value)}
-//                             placeholder="e.g., Full Stack Developer"
+//                             placeholder="e.g., Backend Developer"
 //                         />
 //                     </Form.Group>
 //                 </div>
@@ -169,49 +184,44 @@
 // };
 
 // export default Projects;
-
 import React, { useState, useEffect } from 'react';
 import { Form, Alert } from 'react-bootstrap';
 
 const Projects = ({ data = [], onChange }) => {
     const [errors, setErrors] = useState({});
 
-    // 👉 Always show at least one project form initially
+    // Initialize with one project if empty
     useEffect(() => {
         if (data.length === 0) {
-            onChange([
-                {
-                    title: '',
-                    description: '',
-                    duration: '',
-                    teamSize: '',
-                    technologies: [],
-                    role: '',
-                },
-            ]);
-        }
-    }, []); // run once
-
-    const handleAdd = () => {
-        onChange([
-            ...data,
-            {
+            onChange([{
                 title: '',
                 description: '',
                 duration: '',
                 teamSize: '',
                 technologies: [],
                 role: '',
-            },
-        ]);
+            }]);
+        }
+    }, []);
+
+    const handleAdd = () => {
+        onChange([...data, {
+            title: '',
+            description: '',
+            duration: '',
+            teamSize: '',
+            technologies: [],
+            role: '',
+        }]);
     };
 
     const handleRemove = (index) => {
         const newData = data.filter((_, i) => i !== index);
         onChange(newData);
 
+        // Clear errors for removed project
         const newErrors = { ...errors };
-        delete newErrors[index];
+        Object.keys(newErrors).forEach(key => key.startsWith(`${index}-`) && delete newErrors[key]);
         setErrors(newErrors);
     };
 
@@ -228,7 +238,7 @@ const Projects = ({ data = [], onChange }) => {
     };
 
     const handleTechnologiesChange = (index, value) => {
-        const technologies = value.split(',').map((tech) => tech.trim());
+        const technologies = value.split(',').map(t => t.trim());
         handleChange(index, 'technologies', technologies);
     };
 
@@ -247,35 +257,27 @@ const Projects = ({ data = [], onChange }) => {
         return isValid;
     };
 
-    // 👉 Expose validation function to parent
+    // Expose validation to parent
     useEffect(() => {
         window.projectsValidate = validateProjects;
     }, [data, errors]);
 
-    const getFieldError = (index, field) => {
-        return errors[`${index}-${field}`] || '';
-    };
+    const getFieldError = (index, field) => errors[`${index}-${field}`] || '';
 
     return (
         <div className="array-section">
             {Object.keys(errors).length > 0 && (
                 <Alert variant="warning" className="mb-3">
-                    <Alert.Heading> Please fill in required fields:</Alert.Heading>
-                    <ul className="mb-0">
-                        {Object.values(errors).map((error, idx) => (
-                            <li key={idx}>{error}</li>
-                        ))}
-                    </ul>
+                    <Alert.Heading>Please fill in required fields:</Alert.Heading>
+                    <ul className="mb-0">{Object.values(errors).map((err, i) => <li key={i}>{err}</li>)}</ul>
                 </Alert>
             )}
 
             {data.map((project, index) => (
                 <div key={index} className="array-item">
                     <div className="array-item-header">
-                        <h5>Project #{index + 1}</h5>
-                        <button className="remove-button" onClick={() => handleRemove(index)}>
-                            Remove
-                        </button>
+                        <h5>Project {index + 1}</h5>
+                        {data.length > 1 && <button className="remove-button" onClick={() => handleRemove(index)}>Remove</button>}
                     </div>
 
                     <Form.Group className="mb-3">
@@ -283,16 +285,11 @@ const Projects = ({ data = [], onChange }) => {
                         <Form.Control
                             type="text"
                             value={project.title}
-                            onChange={(e) => handleChange(index, 'title', e.target.value)}
+                            onChange={e => handleChange(index, 'title', e.target.value)}
                             placeholder="e.g., Stock Market Prediction System"
                             isInvalid={!!getFieldError(index, 'title')}
-                            required
                         />
-                        {getFieldError(index, 'title') && (
-                            <Form.Text className="d-block text-danger mt-1">
-                                {getFieldError(index, 'title')}
-                            </Form.Text>
-                        )}
+                        {getFieldError(index, 'title') && <Form.Text className="d-block text-danger mt-1">{getFieldError(index, 'title')}</Form.Text>}
                     </Form.Group>
 
                     <Form.Group className="mb-3">
@@ -301,57 +298,34 @@ const Projects = ({ data = [], onChange }) => {
                             as="textarea"
                             rows={3}
                             value={project.description}
-                            onChange={(e) => handleChange(index, 'description', e.target.value)}
+                            onChange={e => handleChange(index, 'description', e.target.value)}
                             placeholder="Brief project description..."
                         />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Duration</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={project.duration}
-                            onChange={(e) => handleChange(index, 'duration', e.target.value)}
-                            placeholder="e.g., 3 months"
-                        />
+                        <Form.Control type="text" value={project.duration} onChange={e => handleChange(index, 'duration', e.target.value)} placeholder="e.g., 3 months" />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Team Size</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={project.teamSize}
-                            onChange={(e) => handleChange(index, 'teamSize', e.target.value)}
-                            placeholder="e.g., 4"
-                            min="1"
-                        />
+                        <Form.Control type="number" min="1" value={project.teamSize} onChange={e => handleChange(index, 'teamSize', e.target.value)} placeholder="e.g., 4" />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Technologies (comma-separated)</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={project.technologies?.join(', ') || ''}
-                            onChange={(e) => handleTechnologiesChange(index, e.target.value)}
-                            placeholder="e.g., Next.js, Flask, MongoDB"
-                        />
+                        <Form.Control type="text" value={project.technologies?.join(', ') || ''} onChange={e => handleTechnologiesChange(index, e.target.value)} placeholder="e.g., React, Node.js" />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Your Role</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={project.role}
-                            onChange={(e) => handleChange(index, 'role', e.target.value)}
-                            placeholder="e.g., Backend Developer"
-                        />
+                        <Form.Control type="text" value={project.role} onChange={e => handleChange(index, 'role', e.target.value)} placeholder="e.g., Backend Developer" />
                     </Form.Group>
                 </div>
             ))}
 
-            <button className="add-button" onClick={handleAdd}>
-                + Add Project
-            </button>
+            <button className="add-button" onClick={handleAdd}>+ Add Project</button>
         </div>
     );
 };
