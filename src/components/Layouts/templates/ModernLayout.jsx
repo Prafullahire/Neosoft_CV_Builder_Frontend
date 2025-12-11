@@ -99,7 +99,6 @@ const ModernLayout = ({ data }) => {
                     </div>
                 )}
 
-                {/* Projects */}
                 {projects && projects.length > 0 && (
                     <div className="modern-section">
                         <h2 className="section-title">Projects</h2>

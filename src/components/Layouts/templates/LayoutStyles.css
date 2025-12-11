@@ -1,9 +1,8 @@
-/* Common CV Layout Styles */
 .cv-layout {
   background: white;
   padding: 40px;
-  max-width: 210mm; /* A4 width */
-  min-height: 297mm; /* A4 height */
+  max-width: 210mm; 
+  min-height: 297mm; 
   margin: 0 auto;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   font-family: 'Arial', sans-serif;
@@ -22,7 +21,6 @@
   font-size: 1.5rem;
 }
 
-/* Professional Layout */
 .professional-layout .cv-header {
   display: flex;
   align-items: center;

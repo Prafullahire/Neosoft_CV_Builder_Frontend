@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Form } from "react-bootstrap";
 
 const BasicDetails = ({ data = {}, onChange }) => {
@@ -19,7 +19,7 @@ const BasicDetails = ({ data = {}, onChange }) => {
         intro: "",
       });
     }
-  }, []);
+  }, [data, onChange]);
 
   const handleChange = (field, value) => {
     onChange({ ...data, [field]: value });
@@ -31,7 +31,17 @@ const BasicDetails = ({ data = {}, onChange }) => {
     }
   };
 
-  const validateBasicDetails = () => {
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onChange({ ...data, image: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  const validateBasicDetails = useCallback(() => {
     const newErrors = {};
     let isValid = true;
 
@@ -48,11 +58,10 @@ const BasicDetails = ({ data = {}, onChange }) => {
       isValid = false;
     }
 
-    if (!data.phone ) {
-      newErrors.phone = "Phone Number is required";
+    if (!data.phone) {
+      newErrors.phone = "Valid Phone Number is required";
       isValid = false;
-    }
-    else if (!/^\d{10}$/.test(data.phone)) {
+    } else if (!/^\d{10}$/.test(data.phone)) {
       newErrors.phone = "Please enter a valid 10-digit phone number";
       isValid = false;
     }
@@ -64,16 +73,37 @@ const BasicDetails = ({ data = {}, onChange }) => {
 
     setErrors(newErrors);
     return isValid;
-  };
+  }, [data]);
 
   useEffect(() => {
     window.basicDetailsValidate = validateBasicDetails;
-  }, [data, errors]);
+  }, [validateBasicDetails]);
 
   const getFieldError = (field) => errors[field] || "";
 
   return (
     <div className="array-section">
+      <Form.Group className="mb-3">
+        <Form.Label>Profile Image</Form.Label>
+        <Form.Control
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+        />
+        {data?.image && (
+          <img
+            src={data.image}
+            alt="Preview"
+            style={{
+              width: "100px",
+              height: "100px",
+              marginTop: "10px",
+              borderRadius: "50%",
+            }}
+          />
+        )}
+      </Form.Group>
+
       <Form.Group className="mb-3">
         <Form.Label>Full Name *</Form.Label>
         <Form.Control

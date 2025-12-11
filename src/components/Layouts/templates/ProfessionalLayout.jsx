@@ -6,7 +6,6 @@ const ProfessionalLayout = ({ data }) => {
 
     return (
         <div className="cv-layout professional-layout">
-            {/* Header Section */}
             <div className="cv-header">
                 {basicDetails?.image && (
                     <img src={basicDetails.image} alt="Profile" className="profile-image" />
@@ -32,7 +31,6 @@ const ProfessionalLayout = ({ data }) => {
                 </div>
             )}
 
-            {/* Experience */}
             {experience && experience.length > 0 && (
                 <div className="cv-section">
                     <h2>Work Experience</h2>
@@ -56,7 +54,6 @@ const ProfessionalLayout = ({ data }) => {
                 </div>
             )}
 
-            {/* Education */}
             {education && education.length > 0 && (
                 <div className="cv-section">
                     <h2>Education</h2>
