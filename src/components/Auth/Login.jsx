@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Form, Button } from "react-bootstrap";
 import { GoogleLogin } from "@react-oauth/google";
@@ -7,11 +7,16 @@ import { toast } from "react-toastify";
 import "../../styles/LoginUI.css";
 
 const Login = () => {
+  const token = localStorage.getItem("token");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
   const validate = () => {
     if (!email) {
       toast.error("Email is required");

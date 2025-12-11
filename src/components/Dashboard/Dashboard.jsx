@@ -38,6 +38,8 @@ const Dashboard = () => {
 
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
+    localStorage.removeItem("token");
+
     navigate("/login");
   };
 
