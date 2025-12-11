@@ -19,13 +19,14 @@ const Register = () => {
       toast.error("Username is required");
       return false;
     }
+
     if (!email.trim()) {
       toast.error("Email is required");
       return false;
     }
 
-    const emailRegex = /\S+@\S+\.\S+/;
-    if (!emailRegex.test(email)) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
       toast.error("Please enter a valid email");
       return false;
     }
@@ -33,7 +34,9 @@ const Register = () => {
     if (!password) {
       toast.error("Password is required");
       return false;
-    } else if (password.length < 6) {
+    }
+
+    if (password.length < 6) {
       toast.error("Password must be at least 6 characters");
       return false;
     }
@@ -68,12 +71,13 @@ const Register = () => {
       localStorage.setItem("userInfo", JSON.stringify(data));
       navigate("/dashboard");
     } catch (error) {
-      if (error.response && error.response.data) {
-        toast.error(error.response.data.message || "Something went wrong!");
-      } else if (error.request) {
-        toast.error("No response from server. Check backend!");
+      const err = error.response?.data;
+      if (err?.errors?.length > 0) {
+        err.errors.forEach((e) => toast.error(e.message));
+      } else if (err?.message) {
+        toast.error(err.message);
       } else {
-        toast.error(error.message || "Registration failed");
+        toast.error("Registration failed. Try again!");
       }
     }
   };

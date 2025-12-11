@@ -13,13 +13,27 @@ const Login = () => {
   const navigate = useNavigate();
 
   const validate = () => {
-    if (!email || !password) return toast.error("All fields are required");
-    if (!email) return toast.error("Email is required");
+    if (!email) {
+      toast.error("Email is required");
+      return false;
+    }
+
     const reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!reg.test(email)) return toast.error("Enter a valid email");
-    if (!password) return toast.error("Password is required");
-    if (password.length < 6)
-      return toast.error("Password must be 6+ characters");
+    if (!reg.test(email)) {
+      toast.error("Enter a valid email");
+      return false;
+    }
+
+    if (!password) {
+      toast.error("Password is required");
+      return false;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return false;
+    }
+
     return true;
   };
 
@@ -38,10 +52,8 @@ const Login = () => {
       localStorage.setItem("userInfo", JSON.stringify(data));
       navigate("/dashboard");
     } catch (err) {
-      const msg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        "Login failed";
+      const msg = err.response?.data?.message || "Invalid email or password";
+
       toast.error(msg);
     }
   };
