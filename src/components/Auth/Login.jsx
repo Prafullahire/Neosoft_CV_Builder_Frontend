@@ -8,7 +8,6 @@ import "../../styles/LoginUI.css";
 
 const Login = () => {
   const token = localStorage.getItem("token");
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);

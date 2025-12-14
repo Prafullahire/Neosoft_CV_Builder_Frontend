@@ -1,6 +1,10 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import Dashboard from "./components/Dashboard/Dashboard";
@@ -10,7 +14,7 @@ import PublicCV from "./components/Common/PublicCV";
 import ProtectedRoute from "./components/Common/ProtectedRoute";
 
 function App() {
-  const basename = process.env.PUBLIC_URL || '/';
+  const basename = process.env.PUBLIC_URL || "/";
 
   return (
     <Router basename={basename}>

@@ -284,7 +284,7 @@ const CVEditor = () => {
             className="dashboard-link-btn"
             onClick={() => navigate("/dashboard")}
           >
-            Dashboard
+            Go To Dashboard
           </button>
         </div>
         <div className="progress-bar-container">

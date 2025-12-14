@@ -39,7 +39,6 @@ const Dashboard = () => {
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
     localStorage.removeItem("token");
-
     navigate("/login");
   };
 
@@ -107,13 +106,22 @@ const Dashboard = () => {
         <div className="sidebar-user">
           <div className="user-profile-card">
             <div className="user-avatar">
-              <User size={20} />
+              {cvs[0]?.basicDetails?.image ? (
+                <img
+                  src={cvs[0]?.basicDetails?.image}
+                  alt="User"
+                  className="sidebar-profile-img"
+                />
+              ) : (
+                <User size={20} />
+              )}
             </div>
             <div className="user-details">
               <p className="user-name">{userInfo?.username || "User"}</p>
               <p className="user-status">Logged in</p>
             </div>
           </div>
+
           <button onClick={logoutHandler} className="logout-btn">
             <LogOut size={18} />
             <span>Logout</span>
@@ -121,10 +129,8 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="main-content">
         <div className="content-wrapper">
-          {/* Welcome Header */}
           <div className="welcome-header">
             <h2 className="welcome-title">
               Welcome back, {userInfo?.username || "User"}!
@@ -163,11 +169,20 @@ const Dashboard = () => {
                 ) : (
                   cvs.map((cv) => (
                     <div key={cv._id} className="cv-item-card">
-                      <div className="cv-card-header">
-                        <div className="cv-icon-wrapper">
-                          <FileText size={24} />
+                      <div className="cv-top-section">
+                        <div className="cv-profile-wrapper">
+                          {cv.basicDetails?.image ? (
+                            <img
+                              src={cv.basicDetails.image}
+                              alt="Profile"
+                              className="cv-profile-img"
+                            />
+                          ) : (
+                            <User size={40} />
+                          )}
                         </div>
-                        <div className="cv-card-info">
+
+                        <div className="cv-info">
                           <h4 className="cv-card-title">
                             {cv.basicDetails?.name || "Untitled CV"}
                           </h4>
@@ -179,35 +194,36 @@ const Dashboard = () => {
                           </p>
                         </div>
                       </div>
+
+                      {/* ACTION BUTTONS */}
                       <div className="cv-card-actions">
                         <button
                           onClick={() => handleEdit(cv._id)}
                           className="action-btn edit-btn"
-                          title="Edit"
                         >
                           <Edit2 size={16} />
                           <span>Edit</span>
                         </button>
+
                         <button
                           onClick={() => handleDownload(cv._id)}
                           className="action-btn download-btn"
-                          title="Download"
                         >
                           <Download size={16} />
-                          <span>Download</span>
+                          <span>Preview</span>
                         </button>
+
                         <button
                           onClick={() => handleShare(cv._id)}
                           className="action-btn share-btn"
-                          title="Share"
                         >
                           <Share2 size={16} />
                           <span>Share</span>
                         </button>
+
                         <button
                           onClick={() => handleDelete(cv._id)}
                           className="action-btn delete-btn"
-                          title="Delete"
                         >
                           <Trash2 size={16} />
                           <span>Delete</span>

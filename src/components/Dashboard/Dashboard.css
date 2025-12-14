@@ -1,11 +1,9 @@
-/* Main Layout */
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
   background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 50%, #ffffff 100%);
 }
 
-/* Sidebar Styles */
 .sidebar {
   width: 280px;
   background: #ffffff;
@@ -116,13 +114,18 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  overflow: hidden;
+  background: #2ecc71;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: 600;
-  box-shadow: 0 3px 10px rgba(46, 204, 113, 0.3);
+}
+
+.sidebar-profile-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .user-details {
@@ -164,10 +167,8 @@
   background: #e74c3c;
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
 }
 
-/* Main Content */
 .main-content {
   flex: 1;
   margin-left: 280px;
@@ -180,7 +181,6 @@
   padding: 40px;
 }
 
-/* Welcome Header */
 .welcome-header {
   background: white;
   padding: 32px;
@@ -194,16 +194,15 @@
   font-size: 32px;
   font-weight: 700;
   color: #2c3e50;
-  margin: 0 0 8px 0;
+  margin: 0;
 }
 
 .welcome-subtitle {
   font-size: 16px;
   color: #7f8c8d;
-  margin: 0;
+  margin: 8px 0 0 0;
 }
 
-/* Section Header */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -231,93 +230,134 @@
   font-size: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
 }
 
 .create-btn-header:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
 }
 
-/* CVs Grid */
 .cvs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 24px;
 }
 
-/* Loading */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 0;
-  gap: 16px;
-}
-
-.loading-text {
-  color: #7f8c8d;
-  font-size: 15px;
-  margin: 0;
-}
-
-/* Create New CV Card */
-.create-cv-card {
+.cv-item-card {
   background: white;
-  border: 3px dashed #2ecc71;
-  border-radius: 20px;
-  padding: 48px 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
+  border-radius: 22px;
+  padding: 26px;
   transition: all 0.3s ease;
-  min-height: 280px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e8f5e9;
 }
 
-.create-cv-card:hover {
-  background: linear-gradient(135deg, #e8f8f0 0%, #d4f1e3 100%);
-  border-color: #27ae60;
+.cv-item-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(46, 204, 113, 0.15);
+  box-shadow: 0 10px 28px rgba(46, 204, 113, 0.15);
+  border-color: #2ecc71;
 }
 
-.create-cv-icon {
-  width: 80px;
-  height: 80px;
+.cv-top-section {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.cv-profile-wrapper {
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  overflow: hidden;
+  border: 2px solid #2ecc71;
+  background: #e8f8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  margin-bottom: 20px;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
 }
 
-.create-cv-card:hover .create-cv-icon {
-  transform: scale(1.1) rotate(90deg);
+.cv-profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.create-cv-title {
+.cv-info {
+  flex: 1;
+}
+
+.cv-card-title {
   font-size: 20px;
   font-weight: 700;
   color: #2c3e50;
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
 }
 
-.create-cv-subtitle {
-  font-size: 14px;
+.cv-card-date {
+  font-size: 13px;
   color: #7f8c8d;
   margin: 0;
-  line-height: 1.5;
 }
 
-/* Empty State */
+/* Card Action Buttons */
+.cv-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 2px solid;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+}
+
+.edit-btn {
+  border-color: #3498db;
+  color: #3498db;
+}
+.edit-btn:hover {
+  background: #3498db;
+  color: white;
+}
+
+.download-btn {
+  border-color: #9b59b6;
+  color: #9b59b6;
+}
+.download-btn:hover {
+  background: #9b59b6;
+  color: white;
+}
+
+.share-btn {
+  border-color: #f39c12;
+  color: #f39c12;
+}
+.share-btn:hover {
+  background: #f39c12;
+  color: white;
+}
+
+.delete-btn {
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+.delete-btn:hover {
+  background: #e74c3c;
+  color: white;
+}
+
 .empty-state-message {
   grid-column: 1 / -1;
   text-align: center;
@@ -328,11 +368,11 @@
 }
 
 .empty-icon {
+  margin: 0 auto 18px;
   width: 80px;
   height: 80px;
-  margin: 0 auto 20px;
+  background: #e8f8f0;
   border-radius: 50%;
-  background: linear-gradient(135deg, #e8f8f0 0%, #d4f1e3 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -340,146 +380,28 @@
 }
 
 .empty-state-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: #2c3e50;
-  margin: 0 0 8px 0;
 }
 
 .empty-state-text {
-  font-size: 15px;
+  font-size: 14px;
   color: #7f8c8d;
-  margin: 0;
 }
 
-/* CV Item Card */
-.cv-item-card {
-  background: white;
-  border-radius: 20px;
-  padding: 24px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e8f5e9;
-}
-
-.cv-item-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(46, 204, 113, 0.15);
-  border-color: #2ecc71;
-}
-
-.cv-card-header {
+.loading-container {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 0;
   gap: 16px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #ecf0f1;
 }
 
-.cv-icon-wrapper {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #e8f8f0 0%, #d4f1e3 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2ecc71;
-  flex-shrink: 0;
-}
-
-.cv-card-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.cv-card-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #2c3e50;
-  margin: 0 0 6px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cv-card-date {
-  font-size: 13px;
+.loading-text {
   color: #7f8c8d;
-  margin: 0;
 }
 
-.cv-card-actions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.action-btn {
-  padding: 10px 16px;
-  background: transparent;
-  border: 2px solid;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.edit-btn {
-  border-color: #3498db;
-  color: #3498db;
-}
-
-.edit-btn:hover {
-  background: #3498db;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-}
-
-.download-btn {
-  border-color: #9b59b6;
-  color: #9b59b6;
-}
-
-.download-btn:hover {
-  background: #9b59b6;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
-}
-
-.share-btn {
-  border-color: #f39c12;
-  color: #f39c12;
-}
-
-.share-btn:hover {
-  background: #f39c12;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
-}
-
-.delete-btn {
-  border-color: #e74c3c;
-  color: #e74c3c;
-}
-
-.delete-btn:hover {
-  background: #e74c3c;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
-}
-
-/* Responsive Design */
 @media (max-width: 1024px) {
   .cvs-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -492,39 +414,7 @@
     height: auto;
     position: relative;
   }
-
   .main-content {
     margin-left: 0;
-  }
-
-  .content-wrapper {
-    padding: 20px;
-  }
-
-  .welcome-header {
-    padding: 24px;
-  }
-
-  .welcome-title {
-    font-size: 24px;
-  }
-
-  .section-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
-  }
-
-  .create-btn-header {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .cvs-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .cv-card-actions {
-    grid-template-columns: 1fr;
   }
 }

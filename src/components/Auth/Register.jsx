@@ -81,7 +81,6 @@ const Register = () => {
       }
     }
   };
-
   const googleSuccess = async (credentialResponse) => {
     try {
       const { credential } = credentialResponse;
