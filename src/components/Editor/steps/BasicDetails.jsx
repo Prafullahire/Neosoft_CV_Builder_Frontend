@@ -1,226 +1,170 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { forwardRef, useImperativeHandle, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 import { Form } from "react-bootstrap";
 
-const BasicDetails = ({ data = {}, onChange }) => {
-  const [errors, setErrors] = useState({});
+const schema = Yup.object({
+  name: Yup.string().required("Full Name is required"),
+  email: Yup.string()
+    .email("Please enter a valid email address")
+    .required("Email is required"),
+  phone: Yup.string()
+    .matches(/^\d{10}$/, "Enter a valid 10-digit phone number")
+    .required("Phone is required"),
+  designation: Yup.string().required("Designation is required"),
+});
+
+const BasicDetails = forwardRef(({ data = {}, onChange }, ref) => {
+  const { control, handleSubmit, reset, getValues, formState } = useForm({
+    defaultValues: data,
+    resolver: yupResolver(schema),
+  });
 
   useEffect(() => {
-    if (!data || Object.keys(data).length === 0) {
-      onChange({
-        name: "",
-        email: "",
-        phone: "",
-        address: "",
-        city: "",
-        state: "",
-        pincode: "",
-        image: "",
-        designation: "",
-        intro: "",
-      });
-    }
-  }, [data, onChange]);
+    reset(data);
+  }, [data, reset]);
 
-  const handleChange = (field, value) => {
-    onChange({ ...data, [field]: value });
-
-    if (errors[field]) {
-      const newErrors = { ...errors };
-      delete newErrors[field];
-      setErrors(newErrors);
-    }
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onChange({ ...data, image: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-  const validateBasicDetails = useCallback(() => {
-    const newErrors = {};
-    let isValid = true;
-
-    if (!data.name) {
-      newErrors.name = "Full Name is required ";
-      isValid = false;
-    }
-
-    if (!data.email) {
-      newErrors.email = "Email is required";
-      isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      newErrors.email = "Please enter a valid email address";
-      isValid = false;
-    }
-
-    if (!data.phone) {
-      newErrors.phone = "Valid Phone Number is required";
-      isValid = false;
-    } else if (!/^\d{10}$/.test(data.phone)) {
-      newErrors.phone = "Please enter a valid 10-digit phone number";
-      isValid = false;
-    }
-
-    if (!data.designation || data.designation.trim() === "") {
-      newErrors.designation = "Designation is required";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  }, [data]);
-
-  useEffect(() => {
-    window.basicDetailsValidate = validateBasicDetails;
-  }, [validateBasicDetails]);
-
-  const getFieldError = (field) => errors[field] || "";
+  useImperativeHandle(ref, () => ({
+    validate: async () => {
+      let isValid = false;
+      await handleSubmit(
+        (values) => {
+          onChange(values);
+          isValid = true;
+        },
+        () => {
+          isValid = false;
+        }
+      )();
+      return isValid;
+    },
+    getValues: () => getValues(),
+  }));
 
   return (
-    <div className="array-section">
-      <Form.Group className="mb-3">
-        <Form.Label>Profile Image</Form.Label>
-        <Form.Control
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-        />
-        {data?.image && (
-          <img
-            src={data.image}
-            alt="Preview"
-            style={{
-              width: "100px",
-              height: "100px",
-              marginTop: "10px",
-              borderRadius: "50%",
-            }}
-          />
-        )}
-      </Form.Group>
-
+    <form>
       <Form.Group className="mb-3">
         <Form.Label>Full Name *</Form.Label>
-        <Form.Control
-          type="text"
-          value={data.name}
-          onChange={(e) => handleChange("name", e.target.value)}
-          placeholder="e.g., John Doe"
-          isInvalid={!!getFieldError("name")}
-          required
+        <Controller
+          name="name"
+          control={control}
+          render={({ field }) => (
+            <Form.Control
+              {...field}
+              placeholder="e.g., John Doe"
+              isInvalid={!!formState.errors.name}
+            />
+          )}
         />
-        {getFieldError("name") && (
-          <Form.Text className="d-block text-danger mt-1">
-            {getFieldError("name")}
-          </Form.Text>
-        )}
+        <Form.Control.Feedback type="invalid">
+          {formState.errors.name?.message}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>Email *</Form.Label>
-        <Form.Control
-          type="email"
-          value={data.email}
-          onChange={(e) => handleChange("email", e.target.value)}
-          placeholder="e.g., john@example.com"
-          isInvalid={!!getFieldError("email")}
-          required
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <Form.Control
+              {...field}
+              placeholder="e.g., john@example.com"
+              isInvalid={!!formState.errors.email}
+            />
+          )}
         />
-        {getFieldError("email") && (
-          <Form.Text className="d-block text-danger mt-1">
-            {getFieldError("email")}
-          </Form.Text>
-        )}
+        <Form.Control.Feedback type="invalid">
+          {formState.errors.email?.message}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Phone Number *</Form.Label>
-        <Form.Control
-          type="tel"
-          value={data.phone}
-          onChange={(e) => handleChange("phone", e.target.value)}
-          placeholder="e.g., 9876543210"
-          isInvalid={!!getFieldError("phone")}
-          required
+        <Form.Label>Phone *</Form.Label>
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field }) => (
+            <Form.Control
+              {...field}
+              placeholder="e.g., 9876543210"
+              isInvalid={!!formState.errors.phone}
+            />
+          )}
         />
-        {getFieldError("phone") && (
-          <Form.Text className="d-block text-danger mt-1">
-            {getFieldError("phone")}
-          </Form.Text>
-        )}
+        <Form.Control.Feedback type="invalid">
+          {formState.errors.phone?.message}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>Designation *</Form.Label>
-        <Form.Control
-          type="text"
-          value={data.designation}
-          onChange={(e) => handleChange("designation", e.target.value)}
-          placeholder="e.g., Software Engineer"
-          isInvalid={!!getFieldError("designation")}
-          required
+        <Controller
+          name="designation"
+          control={control}
+          render={({ field }) => (
+            <Form.Control
+              {...field}
+              placeholder="e.g., Software Engineer"
+              isInvalid={!!formState.errors.designation}
+            />
+          )}
         />
-        {getFieldError("designation") && (
-          <Form.Text className="d-block text-danger mt-1">
-            {getFieldError("designation")}
-          </Form.Text>
-        )}
+        <Form.Control.Feedback type="invalid">
+          {formState.errors.designation?.message}
+        </Form.Control.Feedback>
       </Form.Group>
 
+      {/* Optional fields */}
       <Form.Group className="mb-3">
         <Form.Label>Address</Form.Label>
-        <Form.Control
-          type="text"
-          value={data.address}
-          onChange={(e) => handleChange("address", e.target.value)}
-          placeholder="Street Address"
+        <Controller
+          name="address"
+          control={control}
+          render={({ field }) => <Form.Control {...field} />}
         />
       </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>City</Form.Label>
-        <Form.Control
-          type="text"
-          value={data.city}
-          onChange={(e) => handleChange("city", e.target.value)}
+        <Controller
+          name="city"
+          control={control}
+          render={({ field }) => <Form.Control {...field} />}
         />
       </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>State</Form.Label>
-        <Form.Control
-          type="text"
-          value={data.state}
-          onChange={(e) => handleChange("state", e.target.value)}
+        <Controller
+          name="state"
+          control={control}
+          render={({ field }) => <Form.Control {...field} />}
         />
       </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>Pincode</Form.Label>
-        <Form.Control
-          type="text"
-          value={data.pincode}
-          onChange={(e) => handleChange("pincode", e.target.value)}
+        <Controller
+          name="pincode"
+          control={control}
+          render={({ field }) => <Form.Control {...field} />}
         />
       </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>Introduction</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={3}
-          value={data.intro}
-          onChange={(e) => handleChange("intro", e.target.value)}
-          placeholder="Briefly introduce yourself..."
+        <Controller
+          name="intro"
+          control={control}
+          render={({ field }) => (
+            <Form.Control as="textarea" {...field} rows={3} />
+          )}
         />
       </Form.Group>
-    </div>
+    </form>
   );
-};
+});
 
 export default BasicDetails;

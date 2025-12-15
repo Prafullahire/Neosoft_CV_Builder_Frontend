@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   Container,
@@ -32,7 +32,7 @@ const CVEditor = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams();
-
+  const stepRefs = useRef([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -93,6 +93,7 @@ const CVEditor = () => {
         e.returnValue = "";
       }
     };
+
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasUnsavedChanges]);
@@ -114,51 +115,13 @@ const CVEditor = () => {
     setHasUnsavedChanges(true);
   };
 
-  const validateCurrentStep = () => {
-    const dataKey = steps[currentStep].dataKey;
-    const stepData = cvData[dataKey];
-
-    let isValid = true;
-    let errorMessages = [];
-
-    switch (currentStep) {
-      case 0: 
-        if (window.basicDetailsValidate) {
-          return window.basicDetailsValidate();
-        }
-        break;
-      case 1: 
-        if (window.educationValidate && !window.educationValidate())
-          return false;
-        break;
-      case 2: 
-        if (window.experienceValidate && !window.experienceValidate())
-          return false;
-        break;
-      case 3: 
-        if (window.projectsValidate && !window.projectsValidate()) return false;
-        break;
-      case 4: 
-        if (window.skillsValidate && !window.skillsValidate()) return false;
-        break;
-      case 5: 
-        if (window.socialProfilesValidate && !window.socialProfilesValidate())
-          return false;
-        break;
-      default:
-        break;
+  const handleNext = async () => {
+    const stepRef = stepRefs.current[currentStep];
+    if (stepRef && typeof stepRef.validate === "function") {
+      const isValid = await stepRef.validate();
+      if (!isValid) return;
     }
-
-    if (errorMessages.length > 0) {
-      showToast(`VALIDATION ERRORS:\n${errorMessages.join("\n")}`, "danger");
-    }
-
-    return isValid;
-  };
-
-  const handleNext = () => {
-    if (validateCurrentStep() && currentStep < steps.length - 1)
-      setCurrentStep(currentStep + 1);
+    if (currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
   };
 
   const handlePrevious = () => {
@@ -200,19 +163,22 @@ const CVEditor = () => {
     setPendingAction("download");
     setShowPaymentModal(true);
   };
+  const handleShare = () => {
+    setPendingAction("share");
+    setShowPaymentModal(true);
+  };
 
   const processDownload = async () => {
     const { generatePDF } = await import("../../utils/pdfUtils");
     const cvName = cvData.basicDetails?.name || "CV";
     const filename = `${cvName.replace(/\s+/g, "_")}_CV.pdf`;
     const result = await generatePDF("cv-preview-wrapper", filename);
-    if (result.success) showToast("PDF downloaded successfully!", "success");
-    else showToast(`Failed to generate PDF: ${result.message}`, "danger");
-  };
-
-  const handleShare = () => {
-    setPendingAction("share");
-    setShowPaymentModal(true);
+    showToast(
+      result.success
+        ? "PDF downloaded successfully!"
+        : `Failed: ${result.message}`,
+      result.success ? "success" : "danger"
+    );
   };
 
   const processShare = async () => {
@@ -233,8 +199,10 @@ const CVEditor = () => {
       const { shareCV } = await import("../../utils/pdfUtils");
       const cvName = cvData.basicDetails?.name || "My CV";
       const result = await shareCV(id, cvName);
-      if (result.success) showToast(result.message, "success");
-      else showToast(`Failed to share: ${result.message}`, "danger");
+      showToast(
+        result.success ? result.message : `Failed: ${result.message}`,
+        result.success ? "success" : "danger"
+      );
     } catch (error) {
       console.error("Error sharing CV:", error);
       showToast("Failed to share CV", "danger");
@@ -263,9 +231,9 @@ const CVEditor = () => {
             onClose={() =>
               setToasts((prev) => prev.filter((t) => t.id !== toast.id))
             }
-            show={true}
-            delay={3000}
+            show
             autohide
+            delay={3000}
             bg={toast.variant}
           >
             <Toast.Body
@@ -305,6 +273,7 @@ const CVEditor = () => {
               </div>
               <div className="form-body">
                 <CurrentStepComponent
+                  ref={(el) => (stepRefs.current[currentStep] = el)}
                   data={cvData[steps[currentStep].dataKey]}
                   onChange={(data) =>
                     handleDataChange(steps[currentStep].dataKey, data)
@@ -324,9 +293,10 @@ const CVEditor = () => {
                   <button
                     className="nav-button finish-button"
                     onClick={handleSave}
+                    disabled={isSaving}
                   >
                     <CheckCircle size={18} />
-                    <span>Finish & Save</span>
+                    <span>{isSaving ? "Saving..." : "Finish & Save"}</span>
                   </button>
                 ) : (
                   <button
@@ -340,7 +310,6 @@ const CVEditor = () => {
               </div>
             </div>
           </Col>
-
           <Col md={6} className="preview-column">
             <div className="preview-panel">
               <div className="preview-header">

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Spinner } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Spinner, Offcanvas, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
@@ -9,16 +9,21 @@ import {
   Edit2,
   Trash2,
   Download,
-  Share2,
   User,
+  Menu,
 } from "lucide-react";
 import cvService from "../../services/cvService";
-import "./Dashboard.css";
+
+const SIDEBAR_WIDTH = 280;
+const SIDEBAR_COLLAPSED = 80;
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mobileSidebar, setMobileSidebar] = useState(false);
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
+
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   useEffect(() => {
@@ -29,216 +34,218 @@ const Dashboard = () => {
     try {
       const data = await cvService.getCVs();
       setCvs(data);
-    } catch (error) {
-      console.error("Error fetching CVs:", error);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   const logoutHandler = () => {
-    localStorage.removeItem("userInfo");
-    localStorage.removeItem("token");
+    localStorage.clear();
     navigate("/login");
   };
 
-  const handleCreateNew = () => {
-    navigate("/layouts");
-  };
-
-  const handleEdit = (id) => navigate(`/editor/${id}`);
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this CV?")) {
-      try {
-        await cvService.deleteCV(id);
-        setCvs(cvs.filter((cv) => cv._id !== id));
-        alert("CV deleted successfully");
-      } catch (error) {
-        console.error("Error deleting CV:", error);
-        alert("Failed to delete CV");
-      }
-    }
-  };
-
-  const handleDownload = (id) => {
-    window.open(`/Neosoft_CV_Builder_Frontend/cv/${id}`, "_blank");
-  };
-
-  const handleShare = async (id) => {
-    try {
-      const cv = cvs.find((c) => c._id === id);
-      if (!cv.isPublic) await cvService.updateCV(id, { ...cv, isPublic: true });
-      const { shareCV } = await import("../../utils/pdfUtils");
-      const cvName = cv.basicDetails?.name || "My CV";
-      const result = await shareCV(id, cvName);
-      alert(
-        result.success ? result.message : `Failed to share: ${result.message}`
-      );
-    } catch (error) {
-      console.error("Error sharing CV:", error);
-      alert("Failed to share CV");
-    }
-  };
-
   return (
-    <div className="dashboard-layout">
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <div className="logo-container">
-            <div className="logo-icon">
-              <FileText size={24} />
-            </div>
-            <div>
-              <h1 className="sidebar-logo">CV Builder</h1>
-              <p className="sidebar-tagline">Create and manage resumes</p>
-            </div>
-          </div>
+    <div
+      className="d-flex min-vh-100"
+      style={{
+        background:
+          "linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 50%, #ffffff 100%)",
+      }}
+    >
+      <aside
+        className="d-none d-md-flex flex-column bg-white shadow"
+        style={{
+          width: desktopCollapsed ? SIDEBAR_COLLAPSED : SIDEBAR_WIDTH,
+          transition: "width 0.3s ease",
+        }}
+      >
+        <SidebarContent
+          collapsed={desktopCollapsed}
+          userInfo={userInfo}
+          logoutHandler={logoutHandler}
+          handleCreateNew={() => navigate("/layouts")}
+        />
+      </aside>
+
+      <Offcanvas
+        show={mobileSidebar}
+        onHide={() => setMobileSidebar(false)}
+        placement="start"
+        className="d-md-none"
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>CV Builder</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <SidebarContent
+            userInfo={userInfo}
+            logoutHandler={logoutHandler}
+            handleCreateNew={() => navigate("/layouts")}
+            closeSidebar={() => setMobileSidebar(false)}
+          />
+        </Offcanvas.Body>
+      </Offcanvas>
+
+      <main className="flex-grow-1 p-3 p-md-4">
+        <div className="mb-3">
+          <Button
+            variant="outline-success"
+            onClick={() =>
+              window.innerWidth < 768
+                ? setMobileSidebar(true)
+                : setDesktopCollapsed((p) => !p)
+            }
+          >
+            <Menu size={18} />
+          </Button>
         </div>
 
-        <nav className="sidebar-nav">
-          <button className="nav-item active">
-            <LayoutGrid size={20} />
-            <span>Dashboard</span>
-          </button>
-        </nav>
-
-        <div className="sidebar-user">
-          <div className="user-profile-card">
-            <div className="user-avatar">
-              {cvs[0]?.basicDetails?.image ? (
-                <img
-                  src={cvs[0]?.basicDetails?.image}
-                  alt="User"
-                  className="sidebar-profile-img"
-                />
-              ) : (
-                <User size={20} />
-              )}
-            </div>
-            <div className="user-details">
-              <p className="user-name">{userInfo?.username || "User"}</p>
-              <p className="user-status">Logged in</p>
-            </div>
-          </div>
-
-          <button onClick={logoutHandler} className="logout-btn">
-            <LogOut size={18} />
-            <span>Logout</span>
-          </button>
+        <div className="card p-4 mb-4 shadow-sm border-start border-success">
+          <h2 className="fw-bold mb-1">
+            Welcome back, {userInfo?.username || "User"}!
+          </h2>
+          <p className="text-muted mb-0">Manage your CVs and create new ones</p>
         </div>
-      </div>
 
-      <div className="main-content">
-        <div className="content-wrapper">
-          <div className="welcome-header">
-            <h2 className="welcome-title">
-              Welcome back, {userInfo?.username || "User"}!
-            </h2>
-            <p className="welcome-subtitle">
-              Manage your CVs and create new ones
-            </p>
+        {loading ? (
+          <div className="text-center py-5">
+            <Spinner />
           </div>
-
-          <div className="cvs-section">
-            <div className="section-header">
-              <h3 className="section-title">Your CVs</h3>
-              <button onClick={handleCreateNew} className="create-btn-header">
-                <Plus size={18} />
-                Create New CV
-              </button>
-            </div>
-
-            {loading ? (
-              <div className="loading-container">
-                <Spinner animation="border" style={{ color: "#2ecc71" }} />
-                <p className="loading-text">Loading your CVs...</p>
-              </div>
-            ) : (
-              <div className="cvs-grid">
-                {cvs.length === 0 ? (
-                  <div className="empty-state-message">
-                    <div className="empty-icon">
-                      <FileText size={48} />
+        ) : (
+          <div className="row g-4">
+            {cvs.map((cv) => (
+              <div className="col-lg-4 col-md-6" key={cv._id}>
+                <div className="card p-3 shadow-sm h-100 border-success">
+                  <div className="d-flex align-items-center mb-3">
+                    <div
+                      className="rounded-circle border me-3 d-flex align-items-center justify-content-center"
+                      style={{ width: 60, height: 60 }}
+                    >
+                      <User />
                     </div>
-                    <h3 className="empty-state-title">No CVs yet</h3>
-                    <p className="empty-state-text">
-                      Create your first CV to get started
-                    </p>
+                    <div>
+                      <h6 className="fw-bold mb-0">
+                        {cv.basicDetails?.name || "Untitled CV"}
+                      </h6>
+                      <small className="text-muted">
+                        {new Date(cv.updatedAt).toLocaleDateString()}
+                      </small>
+                    </div>
                   </div>
-                ) : (
-                  cvs.map((cv) => (
-                    <div key={cv._id} className="cv-item-card">
-                      <div className="cv-top-section">
-                        <div className="cv-profile-wrapper">
-                          {cv.basicDetails?.image ? (
-                            <img
-                              src={cv.basicDetails.image}
-                              alt="Profile"
-                              className="cv-profile-img"
-                            />
-                          ) : (
-                            <User size={40} />
-                          )}
-                        </div>
 
-                        <div className="cv-info">
-                          <h4 className="cv-card-title">
-                            {cv.basicDetails?.name || "Untitled CV"}
-                          </h4>
-                          <p className="cv-card-date">
-                            Last updated:{" "}
-                            {new Date(
-                              cv.updatedAt || Date.now()
-                            ).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
+                  <div className="d-flex flex-wrap gap-2">
+                    <button
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() => navigate(`/editor/${cv._id}`)}
+                    >
+                      <Edit2 size={14} /> Edit
+                    </button>
 
-                      {/* ACTION BUTTONS */}
-                      <div className="cv-card-actions">
-                        <button
-                          onClick={() => handleEdit(cv._id)}
-                          className="action-btn edit-btn"
-                        >
-                          <Edit2 size={16} />
-                          <span>Edit</span>
-                        </button>
+                    <button
+                      className="btn btn-outline-secondary btn-sm"
+                      onClick={() => window.open(`/cv/${cv._id}`, "_blank")}
+                    >
+                      <Download size={14} /> Preview
+                    </button>
 
-                        <button
-                          onClick={() => handleDownload(cv._id)}
-                          className="action-btn download-btn"
-                        >
-                          <Download size={16} />
-                          <span>Preview</span>
-                        </button>
-
-                        <button
-                          onClick={() => handleShare(cv._id)}
-                          className="action-btn share-btn"
-                        >
-                          <Share2 size={16} />
-                          <span>Share</span>
-                        </button>
-
-                        <button
-                          onClick={() => handleDelete(cv._id)}
-                          className="action-btn delete-btn"
-                        >
-                          <Trash2 size={16} />
-                          <span>Delete</span>
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
+                    <button
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={async () => {
+                        if (!window.confirm("Delete this CV?")) return;
+                        await cvService.deleteCV(cv._id);
+                        setCvs((prev) =>
+                          prev.filter((item) => item._id !== cv._id)
+                        );
+                      }}
+                    >
+                      <Trash2 size={14} /> Delete
+                    </button>
+                  </div>
+                </div>
               </div>
-            )}
+            ))}
           </div>
-        </div>
-      </div>
+        )}
+      </main>
     </div>
   );
 };
+
+const SidebarContent = ({
+  collapsed,
+  userInfo,
+  logoutHandler,
+  handleCreateNew,
+  closeSidebar,
+}) => (
+  <div
+    className={`d-flex flex-column h-100 pt-3 px-2 ${
+      collapsed ? "align-items-center text-center" : ""
+    }`}
+  >
+    <div
+      className={`d-flex align-items-center gap-2 mb-2 ${
+        collapsed ? "justify-content-center" : ""
+      }`}
+    >
+      <FileText size={18} />
+      {!collapsed && (
+        <div>
+          <h6 className="mb-0" style={{ fontSize: "15px" }}>
+            CV Builder
+          </h6>
+          <small className="text-muted" style={{ fontSize: "12px" }}>
+            Create resumes
+          </small>
+        </div>
+      )}
+    </div>
+
+    <button
+      className="btn btn-success w-100 my-2 py-2 d-flex align-items-center justify-content-center gap-2"
+      style={{ fontSize: "14px" }}
+      onClick={() => {
+        handleCreateNew();
+        closeSidebar?.();
+      }}
+    >
+      <Plus size={16} />
+      {!collapsed && " Create CV"}
+    </button>
+
+    <div
+      className="w-100 d-flex align-items-center justify-content-center gap-2 text-success fw-semibold py-2"
+      style={{ cursor: "pointer", fontSize: "14px" }}
+    >
+      <LayoutGrid size={16} />
+      {!collapsed && " Dashboard"}
+    </div>
+
+    <div className="mt-auto w-100 mb-3">
+      {!collapsed && (
+        <div className="mb-2">
+          <small className="fw-semibold" style={{ fontSize: "17px" }}>
+            {userInfo?.username}
+          </small>
+          <br />
+          <small className="text-success" style={{ fontSize: "17px" }}>
+            Logged in
+          </small>
+        </div>
+      )}
+
+      <button
+        className="btn btn-outline-danger w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+        style={{ fontSize: "17px" }}
+        onClick={logoutHandler}
+      >
+        <LogOut size={16} />
+        {!collapsed && " Logout"}
+      </button>
+    </div>
+  </div>
+);
 
 export default Dashboard;

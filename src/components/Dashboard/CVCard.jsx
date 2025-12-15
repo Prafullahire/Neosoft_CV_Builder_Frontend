@@ -1,57 +1,76 @@
 import React from "react";
-import "./CVCard.css";
+import { Card, Button, Badge, Stack } from "react-bootstrap";
 
 const CVCard = ({ cv, onEdit, onDelete, onDownload, onShare }) => {
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
-    };
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
 
-    return (
-        <div className="cv-card">
-            <div className="cv-card-header">
-                
-                <h4 className="cv-name">
-                    {cv.basicDetails?.name || "Untitled CV"}
-                </h4>
+  return (
+    <Card className="shadow-sm rounded-4 mb-3">
+      <Card.Body>
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <h5 className="fw-bold text-success mb-0">
+            {cv.basicDetails?.name || "Untitled CV"}
+          </h5>
 
-                <span className="cv-badge">
-                    {cv.layout || "modern"}
-                </span>
-            </div>
-
-            <div className="cv-card-info">
-                <p className="cv-updated">
-                    Last updated: {formatDate(cv.updatedAt)}
-                </p>
-
-                {cv.basicDetails?.email && (
-                    <p className="cv-email">{cv.basicDetails.email}</p>
-                )}
-            </div>
-
-            <div className="cv-card-actions">
-                <button className="action-btn edit" onClick={() => onEdit(cv._id)}>
-                    ✏️ Edit
-                </button>
-
-                <button className="action-btn download" onClick={() => onDownload(cv._id)}>
-                    ⬇️ Download
-                </button>
-
-                <button className="action-btn share" onClick={() => onShare(cv._id)}>
-                    🔗 Share
-                </button>
-            </div>
-
-            <button className="action-btn delete" onClick={() => onDelete(cv._id)}>
-                🗑️ Delete
-            </button>
+          <Badge bg="info" className="text-capitalize px-3 py-2 rounded-pill">
+            {cv.layout || "modern"}
+          </Badge>
         </div>
-    );
+
+        <div className="mb-3">
+          <div className="text-muted small">
+            Last updated: {formatDate(cv.updatedAt)}
+          </div>
+
+          {cv.basicDetails?.email && (
+            <div className="text-muted small">
+              {cv.basicDetails.email}
+            </div>
+          )}
+        </div>
+
+        <Stack direction="horizontal" gap={2} className="mb-3">
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={() => onEdit(cv._id)}
+          >
+            ✏️ Edit
+          </Button>
+
+          <Button
+            size="sm"
+            variant="success"
+            onClick={() => onDownload(cv._id)}
+          >
+            ⬇️ Download
+          </Button>
+
+          <Button
+            size="sm"
+            variant="info"
+            onClick={() => onShare(cv._id)}
+          >
+            🔗 Share
+          </Button>
+        </Stack>
+
+        {/* Delete */}
+        <Button
+          variant="danger"
+          className="w-100"
+          onClick={() => onDelete(cv._id)}
+        >
+          🗑️ Delete
+        </Button>
+      </Card.Body>
+    </Card>
+  );
 };
 
 export default CVCard;

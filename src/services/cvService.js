@@ -12,37 +12,31 @@ const getAuthConfig = () => {
     };
 };
 
-// Create new CV
 export const createCV = async (cvData) => {
     const response = await axios.post(API_URL, cvData, getAuthConfig());
     return response.data;
 };
 
-// Get all CVs for user
 export const getCVs = async () => {
     const response = await axios.get(API_URL, getAuthConfig());
     return response.data;
 };
 
-// Get single CV
 export const getCVById = async (id) => {
     const response = await axios.get(`${API_URL}/${id}`, getAuthConfig());
     return response.data;
 };
 
-// Update CV
 export const updateCV = async (id, cvData) => {
     const response = await axios.put(`${API_URL}/${id}`, cvData, getAuthConfig());
     return response.data;
 };
 
-// Delete CV
 export const deleteCV = async (id) => {
     const response = await axios.delete(`${API_URL}/${id}`, getAuthConfig());
     return response.data;
 };
 
-// Get public CV
 export const getPublicCV = async (id) => {
     try {
         const response = await axios.get(`${API_URL}/public/${id}`);
